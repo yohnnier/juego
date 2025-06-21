@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quién Quiere Ser Enfermero</title>
+    <!-- Script para la animación de confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        /* (El CSS es el mismo, se omite por brevedad pero debe estar aquí) */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
+        :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}body{font-family:'Roboto',sans-serif;margin:0;padding:0;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}.game-container{width:95%;max-width:1200px;height:90vh;max-height:700px;background:rgba(0,0,0,0.2);border-radius:20px;border:2px solid rgba(255,255,255,0.1);text-align:center;position:relative;}.screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;}.screen.active{opacity:1;visibility:visible;}#intro-screen{z-index:20;}#intro-logo{width:80%;max-width:500px;animation:zoomInFade 3.5s forwards;}@keyframes zoomInFade{0%{transform:scale(0.5);opacity:0;}20%{transform:scale(1.1);opacity:1;}100%{transform:scale(1);opacity:1;}}#welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:3rem;color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1;}#welcome-screen h1 span{display:block;}.btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:1.2rem;font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}.btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}.btn:disabled{background:#999;cursor:not-allowed;}#game-screen-wrapper{background:none;}#game-screen{width:100%;height:100%;display:grid;grid-template-columns:1fr 250px;grid-template-rows:100px 1fr;grid-template-areas:"logo prize" "qa   prize";padding:20px;box-sizing:border-box;}#logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}#logo-container img{height:100%;width:auto;max-width:100%;object-fit:contain;}#qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:20px;}#prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:10px;}#prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;height:100%;}#prize-list li{flex-grow:1;display:flex;align-items:center;padding:0 15px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px;}#prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}#prize-list li span:first-child{color:var(--gold);margin-right:15px;}#level-title{font-family:'Orbitron',sans-serif;font-size:1.8rem;color:var(--gold);margin-bottom:10px;text-shadow:0 0 8px var(--gold);}#question-box{width:90%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:1.4rem;padding:15px 25px;margin-bottom:20px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}#options-grid{width:90%;display:grid;grid-template-columns:1fr 1fr;gap:15px;}.option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:1.2rem;border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}.option-box:hover{background:var(--light-blue);}.option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}.option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}.option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}.option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}@keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}@keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}@keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}#lives-display{position:absolute;top:20px;left:20px;font-size:1.5rem;font-family:'Orbitron';}#lives-display span{font-size:2rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}#welcome-screen form{width:90%;max-width:500px;}.welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}#leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}#leaderboard-list{list-style:none;padding:0;}#leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500;}#leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}#final-rank{font-size:1.3rem;color:var(--gold);margin-top:5px;font-weight:700;}
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Pantallas y HTML -->
+        <div id="intro-screen" class="screen active"><img id="intro-logo" src="https://somnozzz.cl/wp-content/uploads/2025/06/ChatGPT-Image-21-jun-2025-00_18_03.png" alt="Logo"></div>
+        <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
+        <div id="game-screen-wrapper" class="screen"><div id="lives-display"></div><div id="game-screen"><div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/ChatGPT-Image-21-jun-2025-00_18_03.png" alt="Logo del Juego"></div><div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div><div id="prize-ladder"><ol id="prize-list" reversed></ol></div></div></div>
+        
+        <!-- PANTALLA FINAL LIMPIA -->
+        <div id="end-screen" class="screen">
+            <h2 id="end-message"></h2>
+            <p id="final-score"></p>
+            <p id="final-rank"></p>
+            <div id="leaderboard-container">
+                <h2>🏆 Top 10 Jugadores 🏆</h2>
+                <ol id="leaderboard-list"></ol>
+                <button id="restart-btn" class="btn">Jugar de Nuevo</button>
+            </div>
+        </div>
+    </div>
+    <!-- Contenedores de Audio -->
+    <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio><audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio><audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio><audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio><audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
+
+    <script>
+        // --> IMPORTANTE: Pega aquí la URL que obtuviste de jsonbase.com
+        const LEADERBOARD_API_URL = "PEGA_AQUI_TU_URL_DE_JSONBASE";
+
+        // --> Banco de preguntas
+        const FULL_QUESTION_BANK = [
+            { question: "Proporción máx. recomendada catéter/vena para minimizar trombosis:", options: ["25%", "33%", "50%", "75%"], correct: 1 },
+            { question: "¿Cuál de estos fármacos de alto riesgo requiere doble chequeo IV?", options: ["Paracetamol", "Enoxaparina", "Insulina", "Omeprazol"], correct: 2 },
+            { question: "Característica típica de la fibrilación auricular en un ECG:", options: ["Ondas P regulares", "Intervalo PR constante", "Ritmo irregularmente irregular", "Complejos QRS anchos"], correct: 2 },
+            { question: "Sitio anatómico preferente para inserción de sonda vesical en adultos:", options: ["Meato uretral", "Fosa ilíaca derecha", "Línea media infraumbilical", "Periné posterior"], correct: 0 },
+            { question: "Vacuna PNI chileno que se administra a los 2, 4 y 6 meses:", options: ["SRP", "BCG", "Hexavalente", "Influenza"], correct: 2 },
+            { question: "¿Cuál medida corresponde a una precaución estándar?", options: ["Uso de N95 por TBC", "Guantes al contacto con fluidos", "Aislamiento por contacto", "Habitación presión negativa"], correct: 1 },
+            { question: "En sistema ESI, ¿qué nivel requiere intervención inmediata y múltiples recursos?", options: ["ESI 1", "ESI 2", "ESI 3", "ESI 5"], correct: 1 },
+            { question: "Principio de la estrategia “Hospital Amigo” en Chile:", options: ["Ingreso restringido de familia", "Rotación frecuente de personal", "Participación del paciente y familia", "Entrega diferida de info"], correct: 2 },
+            { question: "Según Ley de Urgencia, ¿qué debe hacer un hospital ante urgencia vital?", options: ["Derivar de inmediato", "Esperar confirmación previsión", "Estabilizar sin autorización", "Solicitar pago anticipado"], correct: 2 },
+            { question: "¿Qué grupo de pacientes está cubierto por la Ley MILA?", options: ["Adultos mayores crónicos", "Trabajadores con riesgo laboral", "Niños con enf. graves", "Embarazadas sin previsión"], correct: 2 },
+            { question: "En acreditación hospitalaria, ¿qué significa “trazabilidad”?", options: ["Rotación de turnos", "Control de inventario", "Registro verificable de atención", "Pacientes por turno"], correct: 2 },
+            { question: "Días de inasistencia injustificada para abandono de funciones (Estatuto Adm.):", options: ["3 días", "5 días", "7 días", "10 días"], correct: 1 },
+            { question: "Según Ley Karin, ¿qué conducta se considera acoso laboral?", options: ["Evaluación de desempeño", "Exigir puntualidad", "Hostigamiento sistemático", "Reasignación de funciones"], correct: 2 },
+            { question: "En sistema CUDYR, ¿qué dimensión evalúa el compromiso neurológico?", options: ["Hemodinámica", "Conductual", "Conciencia", "Examen físico"], correct: 2 },
+            { question: "Tiempo máx. recomendado para uso de sistema de infusión continua cerrado:", options: ["24 horas", "48 horas", "72 horas", "96 horas"], correct: 3 },
+            { question: "Fármaco con pH 4.5, osmolaridad 800 mOsm/L, terapia >7 días, ¿qué acceso requiere?", options: ["VVP", "Línea media", "PICC o vía central", "Catéter subcutáneo"], correct: 2 },
+            { question: "¿Cuál de estas combinaciones de fármacos NO es compatible en Y-site?", options: ["Furosemida y NaCl 0.9%", "Dopamina y Heparina", "Vancomicina y Ranitidina", "Fentanilo y Midazolam"], correct: 2 },
+            { question: "Característica de un bloqueo AV de segundo grado Mobitz II:", options: ["PR se alarga y omite QRS", "PR constante, QRS omitido", "PR variable, P y QRS sin relación", "Taquicardia ventricular"], correct: 1 },
+            { question: "Acción fundamental al programar bomba de infusión con fármacos vasoactivos:", options: ["Usar equipos de gravedad", "Conectar a catéter SC", "Doble chequeo", "Administrar IM"], correct: 2 },
+            { question: "Conducta inmediata ante un ESAVI grave:", options: ["Dar paracetamol y alta", "Notificar al MINSAL sin evaluar", "Activar protocolo y evaluar", "Repetir vacuna para confirmar"], correct: 2 }
+        ];
+
+        // --- ELEMENTOS DEL DOM ---
+        const allScreens = document.querySelectorAll('.screen');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameScreenWrapper = document.getElementById('game-screen-wrapper');
+        const endScreen = document.getElementById('end-screen');
+        const registerForm = document.getElementById('register-form');
+        const restartBtn = document.getElementById('restart-btn');
+        const livesDisplay = document.getElementById('lives-display');
+        const levelTitle = document.getElementById('level-title');
+        const questionBox = document.getElementById('question-box');
+        const optionsGrid = document.getElementById('options-grid');
+        const prizeList = document.getElementById('prize-list');
+        const endMessage = document.getElementById('end-message');
+        const finalScore = document.getElementById('final-score');
+        const finalRank = document.getElementById('final-rank');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const backgroundMusic = document.getElementById('background-music');
+        const questionStartSound = document.getElementById('question-start-sound');
+
+        // --- ESTADO DEL JUEGO ---
+        let gameLevels = [], lastQuestionObject = null, currentQuestionObject = {};
+        let currentLevel = 0, lives = 3, totalScore = 0, selectedAnswer = false;
+        let currentPlayerName = '', currentPlayerService = '';
+
+        // --- LÓGICA DE API Y SONIDO ---
+        async function getLeaderboardFromAPI(){try{const response=await fetch(LEADERBOARD_API_URL);if(!response.ok)return[];const data=await response.json();return Array.isArray(data)?data:[];}catch(error){console.error("Error al obtener el ranking:",error);return[];}}
+        
+        // --> FUNCIÓN DE ACTUALIZACIÓN CORREGIDA Y MÁS ROBUSTA
+        async function updateLeaderboardAPI(newScore) {
+            let leaderboard = await getLeaderboardFromAPI();
+            leaderboard.push(newScore);
+            leaderboard.sort((a, b) => b.score - a.score);
+            const top10 = leaderboard.slice(0, 10);
+
+            // Si la URL no está configurada, la función no intentará guardar online,
+            // pero devolverá la lista actualizada para que se muestre localmente.
+            if (LEADERBOARD_API_URL === "PEGA_AQUI_TU_URL_DE_JSONBASE") {
+                console.warn("La URL de la API no está configurada. El ranking se mostrará pero no se guardará online.");
+                return top10;
+            }
+
+            try {
+                await fetch(LEADERBOARD_API_URL, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(top10)});
+                return top10;
+            } catch (error) {
+                console.error("Error al actualizar el ranking:", error);
+                return top10; // Devuelve la lista local incluso si falla el guardado.
+            }
+        }
+        
+        function playSound(sound){try { sound.currentTime=0; sound.play(); } catch (e) { console.error("Error al reproducir sonido:", e); }}
+        function stopAllSounds(){document.querySelectorAll('audio').forEach(sound=>{sound.pause();sound.currentTime=0;});}
+        function switchScreen(activeScreen){allScreens.forEach(screen=>screen.classList.remove('active'));activeScreen.classList.add('active');}
+        
+        // --- INICIALIZACIÓN ---
+        function init() {
+            setTimeout(() => switchScreen(welcomeScreen), 3500);
+            registerForm.addEventListener('submit', handleRegisterSubmit);
+            restartBtn.addEventListener('click', resetGame);
+        }
+
+        function resetGame() {
+            currentLevel=0; lives=3; totalScore=0; gameLevels=[]; lastQuestionObject=null;
+            document.getElementById('player-name').value='';
+            document.getElementById('player-service').value='';
+            const startBtn=document.getElementById('start-btn'); startBtn.disabled=false; startBtn.textContent='¡Comenzar a Jugar!';
+            switchScreen(welcomeScreen);
+        }
+        
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            currentPlayerName=document.getElementById('player-name').value;
+            currentPlayerService=document.getElementById('player-service').value;
+            if (!currentPlayerName||!currentPlayerService){alert("Por favor, completa tu nombre y servicio.");return;}
+            const startBtn=document.getElementById('start-btn'); startBtn.disabled=true; startBtn.textContent='Cargando...';
+            startGame();
+        }
+
+        function startGame() {
+            stopAllSounds(); playSound(backgroundMusic);
+            const shuffledQuestions=[...FULL_QUESTION_BANK].sort(()=>0.5-Math.random());
+            gameLevels=[]; const questionsPerLevel=4;
+            for (let i=0; i<5; i++) {
+                gameLevels.push({level:i+1, questions:shuffledQuestions.splice(0,questionsPerLevel)});
+            }
+            currentLevel=0; lives=3; totalScore=0; selectedAnswer=false; lastQuestionObject=null;
+            prizeList.innerHTML='';
+            gameLevels.forEach((levelData)=>{const li=document.createElement('li');li.id=`level-${levelData.level-1}`;li.innerHTML=`<span>${levelData.level}</span> NIVEL ${levelData.level}`;prizeList.appendChild(li);});
+            switchScreen(gameScreenWrapper); loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentLevel>=gameLevels.length){winGame();return;}
+            playSound(questionStartSound); selectedAnswer=false; updateHUD();
+            const levelData=gameLevels[currentLevel];
+            let availableQuestions=levelData.questions;
+            if(lastQuestionObject&&availableQuestions.length>1){availableQuestions=availableQuestions.filter(q=>q.question!==lastQuestionObject.question);}
+            const questionIndex=Math.floor(Math.random()*availableQuestions.length);
+            currentQuestionObject=availableQuestions[questionIndex];
+            questionBox.innerText=currentQuestionObject.question; optionsGrid.innerHTML="";
+            const prefixes=['A','B','C','D'];
+            currentQuestionObject.options.forEach((option,index)=>{const button=document.createElement('button');button.classList.add('option-box');button.innerHTML=`<span class="option-prefix">${prefixes[index]}:</span> ${option}`;button.addEventListener('click',()=>selectAnswer(index,button));optionsGrid.appendChild(button);});
+        }
+
+        function selectAnswer(selectedIndex,button) {
+            if(selectedAnswer)return; selectedAnswer=true;
+            if(backgroundMusic)backgroundMusic.volume=0.3;
+            const buttons=optionsGrid.getElementsByTagName('button'); button.classList.add('selected');
+            setTimeout(()=>{
+                if(backgroundMusic)backgroundMusic.volume=1.0;
+                if(selectedIndex===currentQuestionObject.correct){
+                    playSound(document.getElementById('correct-sound')); button.classList.remove('selected'); button.classList.add('correct');
+                    totalScore++; currentLevel++; lastQuestionObject=null;
+                    setTimeout(loadQuestion,1800);
+                } else {
+                    playSound(document.getElementById('incorrect-sound')); lives--; lastQuestionObject=currentQuestionObject;
+                    button.classList.remove('selected'); button.classList.add('incorrect');
+                    buttons[currentQuestionObject.correct].classList.add('correct');
+                    setTimeout(()=>{if(lives<=0){endGame();}else{loadQuestion();}},2500);
+                }
+            },2000);
+        }
+
+        function updateHUD() {
+            livesDisplay.innerHTML='Intentos: '+'❤️'.repeat(lives);
+            levelTitle.innerText=`NIVEL ${currentLevel+1}`;
+            const prizeItems=prizeList.getElementsByTagName('li');
+            for(let i=0;i<prizeItems.length;i++){prizeItems[i].classList.remove('current');}
+            if(currentLevel<gameLevels.length){document.getElementById(`level-${currentLevel}`).classList.add('current');}
+        }
+        
+        async function handleGameEnd(isWinner) {
+            stopAllSounds();
+            endMessage.textContent = isWinner ? "¡FELICIDADES, HAS GANADO!" : "¡JUEGO TERMINADO!";
+            finalScore.innerText = `Tu puntaje final es: ${totalScore} Puntos`;
+            finalRank.textContent = '';
+            leaderboardList.innerHTML = "<li>Cargando ranking...</li>";
+            switchScreen(endScreen);
+
+            if (typeof confetti === 'function') {
+                const duration = 2 * 1000; const end = Date.now() + duration;
+                (function frame() {
+                    confetti({particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }});
+                    confetti({particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }});
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            }
+
+            const newScoreEntry = { name: currentPlayerName, service: currentPlayerService, score: totalScore, id: Date.now() };
+            const finalLeaderboard = await updateLeaderboardAPI(newScoreEntry);
+            displayLeaderboard(finalLeaderboard, newScoreEntry.id);
+        }
+
+        function winGame() { handleGameEnd(true); }
+        function endGame() { handleGameEnd(false); }
+        
+        function displayLeaderboard(leaderboardData, currentPlayerId) {
+            leaderboardList.innerHTML = "";
+            if (!leaderboardData || leaderboardData.length === 0) {
+                leaderboardList.innerHTML = "<li>Aún no hay puntajes. ¡Sé el primero!</li>";
+                finalRank.textContent = "¡Felicitaciones por ser el pionero!";
+                return;
+            }
+
+            const playerIndex = leaderboardData.findIndex(score => score.id === currentPlayerId);
+            if (playerIndex !== -1) {
+                const rank = playerIndex + 1;
+                finalRank.textContent = `¡Lograste el puesto #${rank} en el Top 10!`;
+            } else {
+                finalRank.textContent = "¡Sigue intentando para entrar al Top 10!";
+            }
+            
+            leaderboardData.forEach((score, index) => {
+                const li = document.createElement('li');
+                const scoreText = `${score.score} Puntos`;
+                li.innerHTML = `<span>#${index + 1} ${score.name} (${score.service})</span><span>${scoreText}</span>`;
+                if (score.id === currentPlayerId) {
+                    li.classList.add('current-player');
+                }
+                leaderboardList.appendChild(li);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
