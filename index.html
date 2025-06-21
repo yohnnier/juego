@@ -19,7 +19,6 @@
         <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
         <div id="game-screen-wrapper" class="screen"><div id="lives-display"></div><div id="game-screen"><div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/ChatGPT-Image-21-jun-2025-00_18_03.png" alt="Logo del Juego"></div><div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div><div id="prize-ladder"><ol id="prize-list" reversed></ol></div></div></div>
         
-        <!-- PANTALLA FINAL LIMPIA -->
         <div id="end-screen" class="screen">
             <h2 id="end-message"></h2>
             <p id="final-score"></p>
@@ -35,10 +34,10 @@
     <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio><audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio><audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio><audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio><audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
 
     <script>
-        // --> IMPORTANTE: Pega aquí la URL que obtuviste de jsonbase.com
-        const LEADERBOARD_API_URL = "PEGA_AQUI_TU_URL_DE_JSONBASE";
+        // --> URL DE TU SCRIPT DE GOOGLE INTEGRADA
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOb5oJElLdB1O1g1M-alaxd7-o4STnA_x2WDwIBIrK4X2PhMBV7mAZTyYcS7OB2elP/exec";
 
-        // --> Banco de preguntas
+        // --> Banco de preguntas (sin cambios)
         const FULL_QUESTION_BANK = [
             { question: "Proporción máx. recomendada catéter/vena para minimizar trombosis:", options: ["25%", "33%", "50%", "75%"], correct: 1 },
             { question: "¿Cuál de estos fármacos de alto riesgo requiere doble chequeo IV?", options: ["Paracetamol", "Enoxaparina", "Insulina", "Omeprazol"], correct: 2 },
@@ -62,143 +61,33 @@
             { question: "Conducta inmediata ante un ESAVI grave:", options: ["Dar paracetamol y alta", "Notificar al MINSAL sin evaluar", "Activar protocolo y evaluar", "Repetir vacuna para confirmar"], correct: 2 }
         ];
 
-        // --- ELEMENTOS DEL DOM ---
-        const allScreens = document.querySelectorAll('.screen');
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const gameScreenWrapper = document.getElementById('game-screen-wrapper');
-        const endScreen = document.getElementById('end-screen');
-        const registerForm = document.getElementById('register-form');
-        const restartBtn = document.getElementById('restart-btn');
-        const livesDisplay = document.getElementById('lives-display');
-        const levelTitle = document.getElementById('level-title');
-        const questionBox = document.getElementById('question-box');
-        const optionsGrid = document.getElementById('options-grid');
-        const prizeList = document.getElementById('prize-list');
-        const endMessage = document.getElementById('end-message');
-        const finalScore = document.getElementById('final-score');
-        const finalRank = document.getElementById('final-rank');
-        const leaderboardList = document.getElementById('leaderboard-list');
-        const backgroundMusic = document.getElementById('background-music');
-        const questionStartSound = document.getElementById('question-start-sound');
-
-        // --- ESTADO DEL JUEGO ---
+        // --- DOM, ESTADO DEL JUEGO Y SONIDO --- (sin cambios)
+        const allScreens = document.querySelectorAll('.screen'); const welcomeScreen = document.getElementById('welcome-screen'); const gameScreenWrapper = document.getElementById('game-screen-wrapper'); const endScreen = document.getElementById('end-screen'); const registerForm = document.getElementById('register-form'); const restartBtn = document.getElementById('restart-btn'); const livesDisplay = document.getElementById('lives-display'); const levelTitle = document.getElementById('level-title'); const questionBox = document.getElementById('question-box'); const optionsGrid = document.getElementById('options-grid'); const prizeList = document.getElementById('prize-list'); const endMessage = document.getElementById('end-message'); const finalScore = document.getElementById('final-score'); const finalRank = document.getElementById('final-rank'); const leaderboardList = document.getElementById('leaderboard-list'); const backgroundMusic = document.getElementById('background-music'); const questionStartSound = document.getElementById('question-start-sound');
         let gameLevels = [], lastQuestionObject = null, currentQuestionObject = {};
         let currentLevel = 0, lives = 3, totalScore = 0, selectedAnswer = false;
         let currentPlayerName = '', currentPlayerService = '';
-
-        // --- LÓGICA DE API Y SONIDO ---
-        async function getLeaderboardFromAPI(){try{const response=await fetch(LEADERBOARD_API_URL);if(!response.ok)return[];const data=await response.json();return Array.isArray(data)?data:[];}catch(error){console.error("Error al obtener el ranking:",error);return[];}}
-        
-        // --> FUNCIÓN DE ACTUALIZACIÓN CORREGIDA Y MÁS ROBUSTA
-        async function updateLeaderboardAPI(newScore) {
-            let leaderboard = await getLeaderboardFromAPI();
-            leaderboard.push(newScore);
-            leaderboard.sort((a, b) => b.score - a.score);
-            const top10 = leaderboard.slice(0, 10);
-
-            // Si la URL no está configurada, la función no intentará guardar online,
-            // pero devolverá la lista actualizada para que se muestre localmente.
-            if (LEADERBOARD_API_URL === "PEGA_AQUI_TU_URL_DE_JSONBASE") {
-                console.warn("La URL de la API no está configurada. El ranking se mostrará pero no se guardará online.");
-                return top10;
-            }
-
-            try {
-                await fetch(LEADERBOARD_API_URL, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(top10)});
-                return top10;
-            } catch (error) {
-                console.error("Error al actualizar el ranking:", error);
-                return top10; // Devuelve la lista local incluso si falla el guardado.
-            }
-        }
-        
         function playSound(sound){try { sound.currentTime=0; sound.play(); } catch (e) { console.error("Error al reproducir sonido:", e); }}
         function stopAllSounds(){document.querySelectorAll('audio').forEach(sound=>{sound.pause();sound.currentTime=0;});}
         function switchScreen(activeScreen){allScreens.forEach(screen=>screen.classList.remove('active'));activeScreen.classList.add('active');}
         
-        // --- INICIALIZACIÓN ---
-        function init() {
-            setTimeout(() => switchScreen(welcomeScreen), 3500);
-            registerForm.addEventListener('submit', handleRegisterSubmit);
-            restartBtn.addEventListener('click', resetGame);
-        }
+        // --- INICIALIZACIÓN Y FLUJO DEL JUEGO --- (sin cambios)
+        function init() { setTimeout(() => switchScreen(welcomeScreen), 3500); registerForm.addEventListener('submit', handleRegisterSubmit); restartBtn.addEventListener('click', resetGame); }
+        function resetGame() { currentLevel=0; lives=3; totalScore=0; gameLevels=[]; lastQuestionObject=null; document.getElementById('player-name').value=''; document.getElementById('player-service').value=''; const startBtn=document.getElementById('start-btn'); startBtn.disabled=false; startBtn.textContent='¡Comenzar a Jugar!'; switchScreen(welcomeScreen); }
+        function handleRegisterSubmit(e) { e.preventDefault(); currentPlayerName=document.getElementById('player-name').value; currentPlayerService=document.getElementById('player-service').value; if (!currentPlayerName||!currentPlayerService){alert("Por favor, completa tu nombre y servicio.");return;} const startBtn=document.getElementById('start-btn'); startBtn.disabled=true; startBtn.textContent='Cargando...'; startGame(); }
+        function startGame() { stopAllSounds(); playSound(backgroundMusic); const shuffledQuestions=[...FULL_QUESTION_BANK].sort(()=>0.5-Math.random()); gameLevels=[]; const questionsPerLevel=4; for (let i=0; i<5; i++) { gameLevels.push({level:i+1, questions:shuffledQuestions.splice(0,questionsPerLevel)}); } currentLevel=0; lives=3; totalScore=0; selectedAnswer=false; lastQuestionObject=null; prizeList.innerHTML=''; gameLevels.forEach((levelData)=>{const li=document.createElement('li');li.id=`level-${levelData.level-1}`;li.innerHTML=`<span>${levelData.level}</span> NIVEL ${levelData.level}`;prizeList.appendChild(li);}); switchScreen(gameScreenWrapper); loadQuestion(); }
+        function loadQuestion() { if (currentLevel>=gameLevels.length){winGame();return;} playSound(questionStartSound); selectedAnswer=false; updateHUD(); const levelData=gameLevels[currentLevel]; let availableQuestions=levelData.questions; if(lastQuestionObject&&availableQuestions.length>1){availableQuestions=availableQuestions.filter(q=>q.question!==lastQuestionObject.question);} const questionIndex=Math.floor(Math.random()*availableQuestions.length); currentQuestionObject=availableQuestions[questionIndex]; questionBox.innerText=currentQuestionObject.question; optionsGrid.innerHTML=""; const prefixes=['A','B','C','D']; currentQuestionObject.options.forEach((option,index)=>{const button=document.createElement('button');button.classList.add('option-box');button.innerHTML=`<span class="option-prefix">${prefixes[index]}:</span> ${option}`;button.addEventListener('click',()=>selectAnswer(index,button));optionsGrid.appendChild(button);}); }
+        function selectAnswer(selectedIndex,button) { if(selectedAnswer)return; selectedAnswer=true; if(backgroundMusic)backgroundMusic.volume=0.3; const buttons=optionsGrid.getElementsByTagName('button'); button.classList.add('selected'); setTimeout(()=>{ if(backgroundMusic)backgroundMusic.volume=1.0; if(selectedIndex===currentQuestionObject.correct){ playSound(document.getElementById('correct-sound')); button.classList.remove('selected'); button.classList.add('correct'); totalScore++; currentLevel++; lastQuestionObject=null; setTimeout(loadQuestion,1800); } else { playSound(document.getElementById('incorrect-sound')); lives--; lastQuestionObject=currentQuestionObject; button.classList.remove('selected'); button.classList.add('incorrect'); buttons[currentQuestionObject.correct].classList.add('correct'); setTimeout(()=>{if(lives<=0){endGame();}else{loadQuestion();}},2500); } },2000); }
+        function updateHUD() { livesDisplay.innerHTML='Intentos: '+'❤️'.repeat(lives); levelTitle.innerText=`NIVEL ${currentLevel+1}`; const prizeItems=prizeList.getElementsByTagName('li'); for(let i=0;i<prizeItems.length;i++){prizeItems[i].classList.remove('current');} if(currentLevel<gameLevels.length){document.getElementById(`level-${currentLevel}`).classList.add('current');} }
+        function winGame() { handleGameEnd(true); }
+        function endGame() { handleGameEnd(false); }
 
-        function resetGame() {
-            currentLevel=0; lives=3; totalScore=0; gameLevels=[]; lastQuestionObject=null;
-            document.getElementById('player-name').value='';
-            document.getElementById('player-service').value='';
-            const startBtn=document.getElementById('start-btn'); startBtn.disabled=false; startBtn.textContent='¡Comenzar a Jugar!';
-            switchScreen(welcomeScreen);
-        }
-        
-        function handleRegisterSubmit(e) {
-            e.preventDefault();
-            currentPlayerName=document.getElementById('player-name').value;
-            currentPlayerService=document.getElementById('player-service').value;
-            if (!currentPlayerName||!currentPlayerService){alert("Por favor, completa tu nombre y servicio.");return;}
-            const startBtn=document.getElementById('start-btn'); startBtn.disabled=true; startBtn.textContent='Cargando...';
-            startGame();
-        }
-
-        function startGame() {
-            stopAllSounds(); playSound(backgroundMusic);
-            const shuffledQuestions=[...FULL_QUESTION_BANK].sort(()=>0.5-Math.random());
-            gameLevels=[]; const questionsPerLevel=4;
-            for (let i=0; i<5; i++) {
-                gameLevels.push({level:i+1, questions:shuffledQuestions.splice(0,questionsPerLevel)});
-            }
-            currentLevel=0; lives=3; totalScore=0; selectedAnswer=false; lastQuestionObject=null;
-            prizeList.innerHTML='';
-            gameLevels.forEach((levelData)=>{const li=document.createElement('li');li.id=`level-${levelData.level-1}`;li.innerHTML=`<span>${levelData.level}</span> NIVEL ${levelData.level}`;prizeList.appendChild(li);});
-            switchScreen(gameScreenWrapper); loadQuestion();
-        }
-
-        function loadQuestion() {
-            if (currentLevel>=gameLevels.length){winGame();return;}
-            playSound(questionStartSound); selectedAnswer=false; updateHUD();
-            const levelData=gameLevels[currentLevel];
-            let availableQuestions=levelData.questions;
-            if(lastQuestionObject&&availableQuestions.length>1){availableQuestions=availableQuestions.filter(q=>q.question!==lastQuestionObject.question);}
-            const questionIndex=Math.floor(Math.random()*availableQuestions.length);
-            currentQuestionObject=availableQuestions[questionIndex];
-            questionBox.innerText=currentQuestionObject.question; optionsGrid.innerHTML="";
-            const prefixes=['A','B','C','D'];
-            currentQuestionObject.options.forEach((option,index)=>{const button=document.createElement('button');button.classList.add('option-box');button.innerHTML=`<span class="option-prefix">${prefixes[index]}:</span> ${option}`;button.addEventListener('click',()=>selectAnswer(index,button));optionsGrid.appendChild(button);});
-        }
-
-        function selectAnswer(selectedIndex,button) {
-            if(selectedAnswer)return; selectedAnswer=true;
-            if(backgroundMusic)backgroundMusic.volume=0.3;
-            const buttons=optionsGrid.getElementsByTagName('button'); button.classList.add('selected');
-            setTimeout(()=>{
-                if(backgroundMusic)backgroundMusic.volume=1.0;
-                if(selectedIndex===currentQuestionObject.correct){
-                    playSound(document.getElementById('correct-sound')); button.classList.remove('selected'); button.classList.add('correct');
-                    totalScore++; currentLevel++; lastQuestionObject=null;
-                    setTimeout(loadQuestion,1800);
-                } else {
-                    playSound(document.getElementById('incorrect-sound')); lives--; lastQuestionObject=currentQuestionObject;
-                    button.classList.remove('selected'); button.classList.add('incorrect');
-                    buttons[currentQuestionObject.correct].classList.add('correct');
-                    setTimeout(()=>{if(lives<=0){endGame();}else{loadQuestion();}},2500);
-                }
-            },2000);
-        }
-
-        function updateHUD() {
-            livesDisplay.innerHTML='Intentos: '+'❤️'.repeat(lives);
-            levelTitle.innerText=`NIVEL ${currentLevel+1}`;
-            const prizeItems=prizeList.getElementsByTagName('li');
-            for(let i=0;i<prizeItems.length;i++){prizeItems[i].classList.remove('current');}
-            if(currentLevel<gameLevels.length){document.getElementById(`level-${currentLevel}`).classList.add('current');}
-        }
-        
+        // --- LÓGICA DE FIN DE JUEGO CONECTADA A GOOGLE SHEETS ---
         async function handleGameEnd(isWinner) {
             stopAllSounds();
             endMessage.textContent = isWinner ? "¡FELICIDADES, HAS GANADO!" : "¡JUEGO TERMINADO!";
             finalScore.innerText = `Tu puntaje final es: ${totalScore} Puntos`;
             finalRank.textContent = '';
-            leaderboardList.innerHTML = "<li>Cargando ranking...</li>";
+            leaderboardList.innerHTML = "<li>Guardando tu puntaje y actualizando el ranking...</li>";
             switchScreen(endScreen);
 
             if (typeof confetti === 'function') {
@@ -211,33 +100,54 @@
             }
 
             const newScoreEntry = { name: currentPlayerName, service: currentPlayerService, score: totalScore, id: Date.now() };
-            const finalLeaderboard = await updateLeaderboardAPI(newScoreEntry);
-            displayLeaderboard(finalLeaderboard, newScoreEntry.id);
-        }
 
-        function winGame() { handleGameEnd(true); }
-        function endGame() { handleGameEnd(false); }
+            try {
+                // Envía el nuevo registro a Google Sheets para guardarlo
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Importante para evitar errores de CORS con Google Scripts
+                    body: JSON.stringify(newScoreEntry)
+                });
+                 // Damos un pequeño tiempo para que Google procese la nueva fila
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Obtiene el historial completo para calcular el Top 10
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const fullLog = await response.json();
+                displayLeaderboard(fullLog, newScoreEntry.id);
+
+            } catch (error) {
+                console.error("Error al guardar o leer el puntaje:", error);
+                leaderboardList.innerHTML = "<li>Hubo un error al conectar con el ranking.</li>";
+            }
+        }
         
-        function displayLeaderboard(leaderboardData, currentPlayerId) {
+        function displayLeaderboard(fullLog, currentPlayerId) {
             leaderboardList.innerHTML = "";
-            if (!leaderboardData || leaderboardData.length === 0) {
-                leaderboardList.innerHTML = "<li>Aún no hay puntajes. ¡Sé el primero!</li>";
-                finalRank.textContent = "¡Felicitaciones por ser el pionero!";
+            
+            // Ordenar el historial por puntaje y obtener el Top 10
+            const leaderboardData = [...fullLog].sort((a, b) => b.puntaje - a.puntaje).slice(0, 10);
+
+            if (leaderboardData.length === 0) {
+                leaderboardList.innerHTML = "<li>Aún no hay puntajes.</li>";
+                finalRank.textContent = "¡Felicitaciones por ser el primero!";
                 return;
             }
 
+            // Buscar la posición del jugador en el ranking del Top 10
             const playerIndex = leaderboardData.findIndex(score => score.id === currentPlayerId);
             if (playerIndex !== -1) {
                 const rank = playerIndex + 1;
                 finalRank.textContent = `¡Lograste el puesto #${rank} en el Top 10!`;
             } else {
-                finalRank.textContent = "¡Sigue intentando para entrar al Top 10!";
+                finalRank.textContent = "¡Buen intento! Sigue jugando para entrar al Top 10.";
             }
             
             leaderboardData.forEach((score, index) => {
                 const li = document.createElement('li');
-                const scoreText = `${score.score} Puntos`;
-                li.innerHTML = `<span>#${index + 1} ${score.name} (${score.service})</span><span>${scoreText}</span>`;
+                // Usa los nombres de columna en minúsculas como definidos en el script
+                const scoreText = `${score.puntaje} Puntos`;
+                li.innerHTML = `<span>#${index + 1} ${score.nombre} (${score.servicio || ''})</span><span>${scoreText}</span>`;
                 if (score.id === currentPlayerId) {
                     li.classList.add('current-player');
                 }
