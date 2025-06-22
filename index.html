@@ -42,8 +42,9 @@
         }
         @media (min-width: 768px) {
             #game-screen {
+                /* --> MODIFICACIÓN: Se reduce la altura de la fila del logo para subir las preguntas */
                 grid-template-columns: 1fr 250px;
-                grid-template-rows: 150px 1fr;
+                grid-template-rows: 100px 1fr; /* Antes era 150px */
                 grid-template-areas:
                     "logo prize"
                     "qa   prize";
@@ -51,8 +52,10 @@
         }
         
         #logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}
-        #logo-container img{height:100%;width:auto;max-width:80%;max-height:120px;object-fit:contain;}
-        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:flex-end;align-items:center; padding-bottom:10px; min-height: 0;}
+        #logo-container img{height:100%;width:auto;max-width:80%;max-height:90px;object-fit:contain;} /* Reducida la altura máxima */
+
+        /* --> MODIFICACIÓN: Se ajusta el contenedor de preguntas para que ocupe el espacio de forma flexible */
+        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:center;align-items:center; min-height: 0;}
         
         #prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:10px;}
         #prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;height:100%;}
@@ -94,27 +97,20 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- Pantalla de intro con video y botón -->
+        <!-- Pantallas y HTML (sin cambios) -->
         <div id="intro-screen" class="screen active">
-            <div id="start-overlay">
-                <button class="btn">Hacer Clic para Empezar</button>
-            </div>
+            <div id="start-overlay"><button class="btn">Hacer Clic para Empezar</button></div>
             <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video>
         </div>
-        
         <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
-        
         <div id="game-screen-wrapper" class="screen">
             <div id="lives-display"></div>
             <div id="game-screen">
-                <div id="logo-container">
-                    <img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego">
-                </div>
+                <div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego"></div>
                 <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div>
                 <div id="prize-ladder"><ol id="prize-list" reversed></ol></div>
             </div>
         </div>
-        
         <div id="end-screen" class="screen">
             <h2 id="end-message"></h2>
             <p id="final-score"></p>
@@ -215,16 +211,13 @@
             // Lógica para la intro de video con botón de inicio
             const startOverlay = document.getElementById('start-overlay');
             const introVideo = document.getElementById('intro-video');
-            
             startOverlay.addEventListener('click', () => {
                 startOverlay.style.display = 'none'; // Oculta el botón
                 introVideo.muted = false; // Activa el sonido del video
                 introVideo.play(); // Reproduce el video
             });
-            
             introVideo.addEventListener('ended', () => switchScreen(welcomeScreen));
             introVideo.addEventListener('error', () => switchScreen(welcomeScreen)); // Fallback si el video no carga
-            
             registerForm.addEventListener('submit', handleRegisterSubmit);
             restartBtn.addEventListener('click', resetGame);
         }
