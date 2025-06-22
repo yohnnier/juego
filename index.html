@@ -7,16 +7,99 @@
     <!-- Script para la animación de confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <style>
-        /* (El CSS es el mismo con una pequeña modificación, se omite por brevedad pero debe estar aquí) */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
-        :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}body{font-family:'Roboto',sans-serif;margin:0;padding:0;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}.game-container{width:95%;max-width:1200px;height:90vh;max-height:700px;background:rgba(0,0,0,0.2);border-radius:20px;border:2px solid rgba(255,255,255,0.1);text-align:center;position:relative;}.screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;}.screen.active{opacity:1;visibility:visible;}#intro-screen{z-index:20;}#intro-video{width:100%;height:100%;object-fit:cover;}#welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:3rem;color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1;}#welcome-screen h1 span{display:block;}.btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:1.2rem;font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}.btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}.btn:disabled{background:#999;cursor:not-allowed;}#game-screen-wrapper{background:none;}#game-screen{width:100%;height:100%;display:grid;grid-template-columns:1fr 250px;grid-template-rows:150px 1fr;grid-template-areas:"logo prize" "qa   prize";padding:20px;box-sizing:border-box;}#logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}#logo-container img{height:100%;width:auto;max-width:100%;object-fit:contain;}#qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:20px;}#prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:10px;}#prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;height:100%;}#prize-list li{flex-grow:1;display:flex;align-items:center;padding:0 15px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px;}#prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}#prize-list li span:first-child{color:var(--gold);margin-right:15px;}#level-title{font-family:'Orbitron',sans-serif;font-size:1.8rem;color:var(--gold);margin-bottom:10px;text-shadow:0 0 8px var(--gold);}#question-box{width:90%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:1.4rem;padding:15px 25px;margin-bottom:20px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}#options-grid{width:90%;display:grid;grid-template-columns:1fr 1fr;gap:15px;}.option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:1.2rem;border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}.option-box:hover{background:var(--light-blue);}.option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}.option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}.option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}.option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}@keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}@keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}@keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}#lives-display{position:absolute;top:20px;left:20px;font-size:1.5rem;font-family:'Orbitron';}#lives-display span{font-size:2rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}#welcome-screen form{width:90%;max-width:500px;}.welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}#leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}#leaderboard-list{list-style:none;padding:0;}#leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500;}#leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}#final-rank{font-size:1.3rem;color:var(--gold);margin-top:5px;font-weight:700;}
+        :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}
+        html, body { height: 100%; margin: 0; }
+        body{font-family:'Roboto',sans-serif;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+        .game-container{width:100%;height:100%;background:rgba(0,0,0,0.2);text-align:center;position:relative;display:flex;justify-content:center;align-items:center;}
+        .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;}
+        .screen.active{opacity:1;visibility:visible;}
+        
+        /* Intro Video y Botón de inicio */
+        #intro-screen{z-index:20; background:black;}
+        #intro-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; z-index: 21;}
+        #start-overlay{position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:22; display:flex; justify-content:center; align-items:center; cursor:pointer;}
+        
+        .btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:1.2rem;font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}
+        .btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}
+        .btn:disabled{background:#999;cursor:not-allowed;}
+        
+        #welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:clamp(2rem, 8vw, 3rem);color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1; margin: 10px 0;}
+        #welcome-screen h1 span{display:block;}
+        #welcome-screen form{width:90%;max-width:500px;}
+        .welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}
+        
+        /* Diseño Responsivo del Juego */
+        #game-screen-wrapper{background:none;}
+        #game-screen{width:100%;height:100%;display:grid;padding:15px;box-sizing:border-box;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto 1fr;
+            grid-template-areas:
+                "prize"
+                "logo"
+                "qa";
+            gap: 15px;
+        }
+        @media (min-width: 768px) {
+            #game-screen {
+                grid-template-columns: 1fr 250px;
+                grid-template-rows: 150px 1fr;
+                grid-template-areas:
+                    "logo prize"
+                    "qa   prize";
+            }
+        }
+        
+        #logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}
+        #logo-container img{height:100%;width:auto;max-width:80%;max-height:120px;object-fit:contain;}
+        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:flex-end;align-items:center; padding-bottom:10px; min-height: 0;}
+        
+        #prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:10px;}
+        #prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;height:100%;}
+        @media (min-width: 768px) {
+            #prize-list { flex-direction:column-reverse; gap:0;}
+        }
+
+        #prize-list li{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:5px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px; font-size: 0.8rem;}
+        @media (min-width: 768px) { #prize-list li { padding: 0 15px; font-size: 1rem; justify-content: flex-start;} }
+        
+        #prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}
+        #prize-list li span:first-child{color:var(--gold);margin-right:10px;}
+        
+        #level-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem, 5vw, 1.8rem);color:var(--gold);margin-bottom:10px;text-shadow:0 0 8px var(--gold);}
+        #question-box{width:95%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:clamp(1rem, 4vw, 1.4rem);padding:15px;margin-bottom:15px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}
+        
+        #options-grid{width:95%;display:grid;grid-template-columns:1fr;gap:10px;}
+        @media (min-width: 768px) { #options-grid { grid-template-columns: 1fr 1fr; gap:15px; } }
+        
+        .option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:clamp(0.9rem, 3.5vw, 1.2rem);border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}
+        .option-box:hover{background:var(--light-blue);}
+        .option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}
+        .option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}
+        .option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}
+        .option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}
+        @keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
+        @keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}
+        @keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}
+        
+        #lives-display{position:absolute;top:15px;left:15px;font-size:1.2rem;font-family:'Orbitron';}
+        #lives-display span{font-size:1.5rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}
+        
+        #leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}
+        #leaderboard-list{list-style:none;padding:0;}
+        #leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500; font-size: clamp(0.8rem, 3vw, 1rem);}
+        #leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}
+        #final-rank{font-size:clamp(1rem, 4vw, 1.3rem);color:var(--gold);margin-top:5px;font-weight:700;}
     </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- --> NUEVO: Pantalla de intro con video -->
+        <!-- Pantalla de intro con video y botón -->
         <div id="intro-screen" class="screen active">
-            <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" autoplay muted playsinline></video>
+            <div id="start-overlay">
+                <button class="btn">Hacer Clic para Empezar</button>
+            </div>
+            <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video>
         </div>
         
         <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
@@ -25,10 +108,11 @@
             <div id="lives-display"></div>
             <div id="game-screen">
                 <div id="logo-container">
-                    <!-- --> NUEVO: Logo actualizado -->
                     <img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego">
                 </div>
-                <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div><div id="prize-ladder"><ol id="prize-list" reversed></ol></div></div>
+                <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div>
+                <div id="prize-ladder"><ol id="prize-list" reversed></ol></div>
+            </div>
         </div>
         
         <div id="end-screen" class="screen">
@@ -128,11 +212,18 @@
         
         // --- INICIALIZACIÓN Y FLUJO DEL JUEGO ---
         function init() {
-            // --> NUEVO: Lógica para la intro de video
+            // Lógica para la intro de video con botón de inicio
+            const startOverlay = document.getElementById('start-overlay');
             const introVideo = document.getElementById('intro-video');
-            const handler = () => switchScreen(welcomeScreen);
-            introVideo.addEventListener('ended', handler);
-            introVideo.addEventListener('error', handler); // Fallback si el video no carga
+            
+            startOverlay.addEventListener('click', () => {
+                startOverlay.style.display = 'none'; // Oculta el botón
+                introVideo.muted = false; // Activa el sonido del video
+                introVideo.play(); // Reproduce el video
+            });
+            
+            introVideo.addEventListener('ended', () => switchScreen(welcomeScreen));
+            introVideo.addEventListener('error', () => switchScreen(welcomeScreen)); // Fallback si el video no carga
             
             registerForm.addEventListener('submit', handleRegisterSubmit);
             restartBtn.addEventListener('click', resetGame);
