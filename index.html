@@ -46,49 +46,18 @@
 </head>
 <body>
     <div class="game-container">
-        <div id="intro-screen" class="screen active">
-            <div id="start-overlay"><button class="btn">Hacer Clic para Empezar</button></div>
-            <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video>
-        </div>
-        <div id="welcome-screen" class="screen">
-            <h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1>
-            <p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p>
-            <form id="register-form">
-                <input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required>
-                <input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required>
-                <button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button>
-            </form>
-        </div>
-        <div id="game-screen-wrapper" class="screen">
-            <div id="lives-display"></div>
-            <div id="game-screen">
-                <div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego"></div>
-                <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div>
-                <div id="prize-ladder"><ol id="prize-list" reversed></ol></div>
-            </div>
-        </div>
-        <div id="end-screen" class="screen">
-            <h2 id="end-message"></h2>
-            <p id="final-score"></p>
-            <p id="final-rank"></p>
-            <div id="leaderboard-container">
-                <h2>🏆 Top 10 Jugadores 🏆</h2>
-                <ol id="leaderboard-list"></ol>
-                <button id="restart-btn" class="btn">Jugar de Nuevo</button>
-            </div>
-        </div>
+        <div id="intro-screen" class="screen active"> <div id="start-overlay"><button class="btn">Hacer Clic para Empezar</button></div> <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video> </div>
+        <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
+        <div id="game-screen-wrapper" class="screen"> <div id="lives-display"></div> <div id="game-screen"> <div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego"></div> <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div> <div id="prize-ladder"><ol id="prize-list" reversed></ol></div> </div> </div>
+        <div id="end-screen" class="screen"> <h2 id="end-message"></h2> <p id="final-score"></p> <p id="final-rank"></p> <div id="leaderboard-container"> <h2>🏆 Top 10 Jugadores 🏆</h2> <ol id="leaderboard-list"></ol> <button id="restart-btn" class="btn">Jugar de Nuevo</button> </div> </div>
     </div>
-    <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio>
-    <audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio>
-    <audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio>
-    <audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio>
-    <audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
+    <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio><audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio><audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio><audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio><audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
 
     <script>
-        // Pega aquí tu URL del Google Apps Script Web App
+        // --- URL DEFINITIVA ---
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNJ6PQRC8G2vUDCiU2-2RAp65u9N3WXYc2sqeV-DmKYhQpXYpPa5mGOnsKRyx-OSM/exec";
 
-        // --- Banco de preguntas de ejemplo (corta para la demo) ---
+        // --- Banco de preguntas de ejemplo (puedes reemplazar por el tuyo completo) ---
         const FULL_QUESTION_BANK = [
             { question: "¿Cuál es la capital de Francia?", options: ["Madrid", "París", "Roma", "Berlín"], correct: 1 },
             { question: "¿Cuánto es 2+2?", options: ["3", "4", "5", "2"], correct: 1 },
@@ -96,27 +65,11 @@
             { question: "¿Quién escribió 'Cien años de soledad'?", options: ["Gabriel García Márquez", "Pablo Neruda", "Mario Vargas Llosa", "Julio Cortázar"], correct: 0 }
         ];
 
-        const allScreens = document.querySelectorAll('.screen');
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const gameScreenWrapper = document.getElementById('game-screen-wrapper');
-        const endScreen = document.getElementById('end-screen');
-        const registerForm = document.getElementById('register-form');
-        const restartBtn = document.getElementById('restart-btn');
-        const livesDisplay = document.getElementById('lives-display');
-        const levelTitle = document.getElementById('level-title');
-        const questionBox = document.getElementById('question-box');
-        const optionsGrid = document.getElementById('options-grid');
-        const prizeList = document.getElementById('prize-list');
-        const endMessage = document.getElementById('end-message');
-        const finalScore = document.getElementById('final-score');
-        const finalRank = document.getElementById('final-rank');
-        const leaderboardList = document.getElementById('leaderboard-list');
-        const backgroundMusic = document.getElementById('background-music');
-        const questionStartSound = document.getElementById('question-start-sound');
+        // --- El resto de tus variables y lógica originales aquí ---
+        const allScreens = document.querySelectorAll('.screen'); const welcomeScreen = document.getElementById('welcome-screen'); const gameScreenWrapper = document.getElementById('game-screen-wrapper'); const endScreen = document.getElementById('end-screen'); const registerForm = document.getElementById('register-form'); const restartBtn = document.getElementById('restart-btn'); const livesDisplay = document.getElementById('lives-display'); const levelTitle = document.getElementById('level-title'); const questionBox = document.getElementById('question-box'); const optionsGrid = document.getElementById('options-grid'); const prizeList = document.getElementById('prize-list'); const endMessage = document.getElementById('end-message'); const finalScore = document.getElementById('final-score'); const finalRank = document.getElementById('final-rank'); const leaderboardList = document.getElementById('leaderboard-list'); const backgroundMusic = document.getElementById('background-music'); const questionStartSound = document.getElementById('question-start-sound');
         let gameLevels = [], lastQuestionObject = null, currentQuestionObject = {};
         let currentLevel = 0, lives = 3, totalScore = 0, selectedAnswer = false;
         let currentPlayerName = '', currentPlayerService = '';
-
         function playSound(sound){try { sound.currentTime=0; sound.play(); } catch (e) { console.error("Error al reproducir sonido:", e); }}
         function stopAllSounds(){document.querySelectorAll('audio').forEach(sound=>{sound.pause();sound.currentTime=0;});}
         function switchScreen(activeScreen){allScreens.forEach(screen=>screen.classList.remove('active'));activeScreen.classList.add('active');}
@@ -130,7 +83,7 @@
         function winGame() { handleGameEnd(true); }
         function endGame() { handleGameEnd(false); }
 
-        // ================= FUNCION AJUSTADA ===================
+        // ================= FUNCION CORREGIDA PARA RANKING SIN CORS ===================
         async function handleGameEnd(isWinner) {
             stopAllSounds();
             endMessage.textContent = isWinner ? "¡FELICIDADES, HAS GANADO!" : "¡JUEGO TERMINADO!";
@@ -170,7 +123,7 @@
                 leaderboardList.innerHTML = `<li>Hubo un error al conectar con el ranking. Revisa la consola (F12) para más detalles.</li>`;
             }
         }
-        // ================= FIN AJUSTE ===================
+        // ================= FIN FUNCION CORREGIDA ===================
 
         function displayLeaderboard(fullLog, currentPlayerId) {
             leaderboardList.innerHTML = "";
