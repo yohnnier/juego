@@ -2,57 +2,566 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="handheldfriendly" content="true">
+    <meta name="mobileoptimized" content="width">
     <title>Quién Quiere Ser Enfermero</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS (sin cambios) */
+        /* CSS optimizado para móviles */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
-        :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}
-        html, body { height: 100%; margin: 0; }
-        body{font-family:'Roboto',sans-serif;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;overflow:hidden;}
-        .game-container{width:100%;height:100%;background:rgba(0,0,0,0.2);text-align:center;position:relative;display:flex;justify-content:center;align-items:center;}
-        .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;padding: 15px; box-sizing: border-box;}
-        .screen.active{opacity:1;visibility:visible;}
-        #intro-screen{z-index:20; background:black; padding: 0;}
-        #intro-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; z-index: 21;}
-        #start-overlay{position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:22; display:flex; justify-content:center; align-items:center; cursor:pointer;}
-        .btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:clamp(1rem, 4vw, 1.2rem);font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}
-        .btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}
-        .btn:disabled{background:#999;cursor:not-allowed;}
-        #welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:clamp(2rem, 8vw, 3rem);color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1; margin: 10px 0;}
-        #welcome-screen h1 span{display:block;}
-        #welcome-screen form{width:90%;max-width:500px;}
-        .welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}
-        #game-screen-wrapper{background:none;}
-        #game-screen{width:100%;height:100%;display:grid;box-sizing:border-box; grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; grid-template-areas: "prize" "logo" "qa"; gap: 10px; }
-        #logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}
-        #logo-container img{width:auto;max-width:60%;max-height:10vh;object-fit:contain;}
-        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center; min-height: 0;}
-        #prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:5px;}
-        #prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;height:100%;}
-        #prize-list li{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:5px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px; font-size: 0.7rem; white-space: nowrap;}
-        #prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}
-        #prize-list li span:first-child{color:var(--gold);margin-right:5px;}
-        #level-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem, 5vw, 1.8rem);color:var(--gold);margin: 10px 0;text-shadow:0 0 8px var(--gold);}
-        #question-box{width:95%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:clamp(1rem, 4vw, 1.4rem);padding:15px;margin-bottom:15px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}
-        #options-grid{width:95%;display:grid;grid-template-columns:1fr;gap:10px;}
-        .option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:clamp(0.9rem, 3.5vw, 1.2rem);border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}
-        #lives-display{position:absolute;top:15px;left:15px;font-size:1.2rem;font-family:'Orbitron';}
-        #lives-display span{font-size:1.5rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}
-        @media (min-width: 768px) { #game-screen { grid-template-columns: 1fr 250px; grid-template-rows: 120px 1fr; grid-template-areas: "logo prize" "qa   prize"; gap: 20px; padding: 20px; } #qa-container { justify-content: center; } #logo-container img { max-height: 100px; max-width: 80%; } #prize-list { flex-direction:column-reverse; gap:0;} #prize-list li { padding: 0 15px; font-size: 1rem; justify-content: flex-start;} #prize-list li span:first-child { margin-right: 15px; } #options-grid { grid-template-columns: 1fr 1fr; gap:15px; } }
-        .option-box:hover{background:var(--light-blue);}.option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}.option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}.option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}.option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}@keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}@keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}@keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}
-        #leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}#leaderboard-list{list-style:none;padding:0;}#leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500; font-size: clamp(0.8rem, 3vw, 1rem);}#leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}#final-rank{font-size:clamp(1rem, 4vw, 1.3rem);color:var(--gold);margin-top:5px;font-weight:700;}
+        :root {
+            --main-blue: #02022d;
+            --dark-blue: #0c0c4c;
+            --light-blue: #1e3a8a;
+            --gold: #ffd700;
+            --orange-select: #f9a825;
+            --green-correct: #28a745;
+            --red-incorrect: #dc3545;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+            background: radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);
+            z-index: 10;
+            padding: 15px;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        #intro-screen {
+            z-index: 20;
+            background: black;
+            padding: 0;
+        }
+        
+        #intro-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 21;
+        }
+        
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--gold), var(--orange-select));
+            color: var(--main-blue);
+            border: none;
+            padding: 12px 25px;
+            font-size: clamp(1rem, 5vw, 1.3rem);
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+            z-index: 1;
+            width: 90%;
+            max-width: 300px;
+            touch-action: manipulation;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+        }
+        
+        .btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+        
+        #welcome-screen h1, #end-screen h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--gold);
+            z-index: 1;
+            margin: 10px 0;
+            line-height: 1.2;
+        }
+        
+        #welcome-screen h1 span {
+            display: block;
+        }
+        
+        #welcome-screen p {
+            font-size: clamp(0.9rem, 4vw, 1.1rem);
+            margin: 10px 15px;
+        }
+        
+        #welcome-screen form {
+            width: 95%;
+            max-width: 500px;
+        }
+        
+        .welcome-input {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 12px auto;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: clamp(0.9rem, 4vw, 1.1rem);
+        }
+        
+        #game-screen-wrapper {
+            background: none;
+        }
+        
+        #game-screen {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            box-sizing: border-box;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto 1fr;
+            grid-template-areas: 
+                "prize"
+                "logo"
+                "qa";
+            gap: 10px;
+            padding: 10px;
+        }
+        
+        #logo-container {
+            grid-area: logo;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 0;
+        }
+        
+        #logo-container img {
+            width: auto;
+            max-width: 80%;
+            max-height: 8vh;
+            object-fit: contain;
+        }
+        
+        #qa-container {
+            grid-area: qa;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #prize-ladder {
+            grid-area: prize;
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
+            padding: 5px;
+            max-height: 15vh;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #prize-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 5px;
+            height: 100%;
+        }
+        
+        #prize-list li {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 8px;
+            font-family: 'Orbitron', sans-serif;
+            color: rgba(255,255,255,0.7);
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            font-size: clamp(0.6rem, 3vw, 0.8rem);
+            white-space: nowrap;
+            min-width: 80px;
+        }
+        
+        #prize-list li.current {
+            background-color: var(--orange-select);
+            color: var(--main-blue);
+            font-weight: 700;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--orange-select);
+        }
+        
+        #prize-list li span:first-child {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+        
+        #level-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.1rem, 5vw, 1.5rem);
+            color: var(--gold);
+            margin: 5px 0;
+            text-shadow: 0 0 8px var(--gold);
+        }
+        
+        #question-box {
+            width: 95%;
+            height: auto;
+            min-height: 70px;
+            background: linear-gradient(180deg, var(--main-blue), var(--dark-blue));
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(0.9rem, 4vw, 1.2rem);
+            padding: 12px;
+            margin-bottom: 10px;
+            clip-path: polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);
+        }
+        
+        #options-grid {
+            width: 95%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .option-box {
+            background: linear-gradient(180deg, var(--main-blue), var(--dark-blue));
+            border: 2px solid var(--gold);
+            color: #fff;
+            font-size: clamp(0.9rem, 3.8vw, 1.1rem);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            padding: 10px 15px;
+            clip-path: polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);
+            touch-action: manipulation;
+        }
+        
+        #lives-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: clamp(0.9rem, 4vw, 1.1rem);
+            font-family: 'Orbitron';
+            z-index: 5;
+        }
+        
+        #lives-display span {
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            margin-left: 3px;
+            color: var(--red-incorrect);
+            text-shadow: 0 0 5px var(--red-incorrect);
+        }
+        
+        /* Animaciones optimizadas para móviles */
+        .option-box:hover {
+            background: var(--light-blue);
+        }
+        
+        .option-prefix {
+            color: var(--orange-select);
+            font-family: 'Orbitron', sans-serif;
+            margin-right: 10px;
+        }
+        
+        .option-box.selected {
+            background: var(--orange-select);
+            color: var(--main-blue);
+            font-weight: bold;
+            animation: pulse-select 1.2s infinite;
+        }
+        
+        .option-box.correct {
+            background: var(--green-correct);
+            animation: flash-correct 1s;
+        }
+        
+        .option-box.incorrect {
+            background: var(--red-incorrect);
+            animation: shake-incorrect 0.5s;
+        }
+        
+        @keyframes pulse-select {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes flash-correct {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes shake-incorrect {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Pantalla final */
+        #leaderboard-container {
+            margin-top: 15px;
+            width: 95%;
+            max-width: 600px;
+            text-align: left;
+        }
+        
+        #leaderboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        #leaderboard-list li {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+        }
+        
+        #leaderboard-list li.current-player {
+            background: var(--gold);
+            color: var(--main-blue);
+            font-weight: 700;
+        }
+        
+        #final-rank {
+            font-size: clamp(1rem, 4.5vw, 1.2rem);
+            color: var(--gold);
+            margin-top: 5px;
+            font-weight: 700;
+        }
+        
+        /* Media queries para tablets y pantallas más grandes */
+        @media (min-width: 600px) {
+            #game-screen {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas: 
+                    "logo prize"
+                    "qa prize";
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            #prize-ladder {
+                max-height: none;
+                overflow-x: visible;
+            }
+            
+            #prize-list {
+                flex-direction: column-reverse;
+                gap: 0;
+                height: auto;
+            }
+            
+            #prize-list li {
+                padding: 8px 12px;
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+                justify-content: flex-start;
+                min-width: auto;
+            }
+            
+            #prize-list li span:first-child {
+                margin-right: 10px;
+            }
+            
+            #options-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            #logo-container img {
+                max-height: 12vh;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            #game-screen {
+                grid-template-columns: 1fr 250px;
+                grid-template-rows: 100px 1fr;
+            }
+            
+            #qa-container {
+                justify-content: center;
+            }
+            
+            #logo-container img {
+                max-height: 100px;
+                max-width: 80%;
+            }
+            
+            #prize-list li {
+                padding: 0 15px;
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 15px 30px;
+            }
+        }
+        
+        /* Orientación landscape */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #game-screen {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas: 
+                    "logo prize"
+                    "qa prize";
+            }
+            
+            #prize-ladder {
+                max-height: none;
+            }
+            
+            #prize-list {
+                flex-direction: column-reverse;
+                gap: 0;
+            }
+            
+            #options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            #logo-container img {
+                max-height: 12vh;
+            }
+            
+            #question-box, .option-box {
+                min-height: 60px;
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div id="intro-screen" class="screen active"> <div id="start-overlay"><button class="btn">Hacer Clic para Empezar</button></div> <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video> </div>
-        <div id="welcome-screen" class="screen"><h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1><p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p><form id="register-form"><input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required><input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required><button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button></form></div>
-        <div id="game-screen-wrapper" class="screen"> <div id="lives-display"></div> <div id="game-screen"> <div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego"></div> <div id="qa-container"><h2 id="level-title"></h2><div id="question-box"></div><div id="options-grid"></div></div> <div id="prize-ladder"><ol id="prize-list" reversed></ol></div> </div> </div>
-        <div id="end-screen" class="screen"> <h2 id="end-message"></h2> <p id="final-score"></p> <p id="final-rank"></p> <div id="leaderboard-container"> <h2>🏆 Top 10 Jugadores 🏆</h2> <ol id="leaderboard-list"></ol> <button id="restart-btn" class="btn">Jugar de Nuevo</button> </div> </div>
+        <div id="intro-screen" class="screen active"> 
+            <div id="start-overlay"><button class="btn">Hacer Clic para Empezar</button></div> 
+            <video id="intro-video" src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.mp4" muted playsinline></video> 
+        </div>
+        <div id="welcome-screen" class="screen">
+            <h1>QUIÉN QUIERE SER<br><span>ENFERMERO</span></h1>
+            <p>Ingresa tus datos para comenzar. Tienes 3 intentos.</p>
+            <form id="register-form">
+                <input type="text" id="player-name" class="welcome-input" placeholder="Tu Nombre y Apellido" required>
+                <input type="text" id="player-service" class="welcome-input" placeholder="Tu Servicio / Área de Trabajo" required>
+                <button type="submit" id="start-btn" class="btn">¡Comenzar a Jugar!</button>
+            </form>
+        </div>
+        <div id="game-screen-wrapper" class="screen"> 
+            <div id="lives-display"></div> 
+            <div id="game-screen"> 
+                <div id="logo-container"><img src="https://somnozzz.cl/wp-content/uploads/2025/06/QQSM.png" alt="Logo del Juego"></div> 
+                <div id="qa-container">
+                    <h2 id="level-title"></h2>
+                    <div id="question-box"></div>
+                    <div id="options-grid"></div>
+                </div> 
+                <div id="prize-ladder"><ol id="prize-list" reversed></ol></div> 
+            </div> 
+        </div>
+        <div id="end-screen" class="screen"> 
+            <h2 id="end-message"></h2> 
+            <p id="final-score"></p> 
+            <p id="final-rank"></p> 
+            <div id="leaderboard-container"> 
+                <h2>🏆 Top 10 Jugadores 🏆</h2> 
+                <ol id="leaderboard-list"></ol> 
+                <button id="restart-btn" class="btn">Jugar de Nuevo</button> 
+            </div> 
+        </div>
     </div>
-    <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio><audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio><audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio><audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio><audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
+    
+    <!-- Sonidos optimizados para móviles -->
+    <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio>
+    <audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio>
+    <audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio>
+    <audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio>
+    <audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
 
     <script>
         // --> URL DEFINITIVA INTEGRADA <--
@@ -152,52 +661,241 @@
             { question: "¿Cuál es el objetivo de mantener una buena calidad de compresiones torácicas durante la RCP avanzada?", options: ["Evitar hipoxia celular y aumentar la perfusión cerebral y coronaria.", "Aumentar la frecuencia cardíaca espontánea.", "Reducir el dolor en el tórax del paciente.", "Respuesta estimuladora adrenérgica de los pulmones."], correct: 0 }
         ];
 
-        const allScreens = document.querySelectorAll('.screen'); const welcomeScreen = document.getElementById('welcome-screen'); const gameScreenWrapper = document.getElementById('game-screen-wrapper'); const endScreen = document.getElementById('end-screen'); const registerForm = document.getElementById('register-form'); const restartBtn = document.getElementById('restart-btn'); const livesDisplay = document.getElementById('lives-display'); const levelTitle = document.getElementById('level-title'); const questionBox = document.getElementById('question-box'); const optionsGrid = document.getElementById('options-grid'); const prizeList = document.getElementById('prize-list'); const endMessage = document.getElementById('end-message'); const finalScore = document.getElementById('final-score'); const finalRank = document.getElementById('final-rank'); const leaderboardList = document.getElementById('leaderboard-list'); const backgroundMusic = document.getElementById('background-music'); const questionStartSound = document.getElementById('question-start-sound');
+        const allScreens = document.querySelectorAll('.screen'); 
+        const welcomeScreen = document.getElementById('welcome-screen'); 
+        const gameScreenWrapper = document.getElementById('game-screen-wrapper'); 
+        const endScreen = document.getElementById('end-screen'); 
+        const registerForm = document.getElementById('register-form'); 
+        const restartBtn = document.getElementById('restart-btn'); 
+        const livesDisplay = document.getElementById('lives-display'); 
+        const levelTitle = document.getElementById('level-title'); 
+        const questionBox = document.getElementById('question-box'); 
+        const optionsGrid = document.getElementById('options-grid'); 
+        const prizeList = document.getElementById('prize-list'); 
+        const endMessage = document.getElementById('end-message'); 
+        const finalScore = document.getElementById('final-score'); 
+        const finalRank = document.getElementById('final-rank'); 
+        const leaderboardList = document.getElementById('leaderboard-list'); 
+        const backgroundMusic = document.getElementById('background-music'); 
+        const questionStartSound = document.getElementById('question-start-sound');
+        
         let gameLevels = [], lastQuestionObject = null, currentQuestionObject = {};
         let currentLevel = 0, lives = 3, totalScore = 0, selectedAnswer = false;
         let currentPlayerName = '', currentPlayerService = '';
-        function playSound(sound){try { sound.currentTime=0; sound.play(); } catch (e) { console.error("Error al reproducir sonido:", e); }}
-        function stopAllSounds(){document.querySelectorAll('audio').forEach(sound=>{sound.pause();sound.currentTime=0;});}
-        function switchScreen(activeScreen){allScreens.forEach(screen=>screen.classList.remove('active'));activeScreen.classList.add('active');}
-        function init() { const startOverlay = document.getElementById('start-overlay'); const introVideo = document.getElementById('intro-video'); startOverlay.addEventListener('click', () => { startOverlay.style.display = 'none'; introVideo.muted = false; introVideo.play(); }); introVideo.addEventListener('ended', () => switchScreen(welcomeScreen)); introVideo.addEventListener('error', () => switchScreen(welcomeScreen)); registerForm.addEventListener('submit', handleRegisterSubmit); restartBtn.addEventListener('click', resetGame); }
-        function resetGame() { currentLevel=0; lives=3; totalScore=0; gameLevels=[]; lastQuestionObject=null; document.getElementById('player-name').value=''; document.getElementById('player-service').value=''; const startBtn=document.getElementById('start-btn'); startBtn.disabled=false; startBtn.textContent='¡Comenzar a Jugar!'; switchScreen(welcomeScreen); }
-        function handleRegisterSubmit(e) { e.preventDefault(); currentPlayerName=document.getElementById('player-name').value; currentPlayerService=document.getElementById('player-service').value; if (!currentPlayerName||!currentPlayerService){alert("Por favor, completa tu nombre y servicio.");return;} const startBtn=document.getElementById('start-btn'); startBtn.disabled=true; startBtn.textContent='Cargando...'; startGame(); }
         
-        // ======================================================================================
-        // === LÓGICA DE JUEGO MODIFICADA PARA 8 NIVELES ========================================
-        // ======================================================================================
+        function playSound(sound) {
+            try { 
+                sound.currentTime = 0; 
+                sound.play(); 
+            } catch (e) { 
+                console.error("Error al reproducir sonido:", e); 
+            }
+        }
+        
+        function stopAllSounds() {
+            document.querySelectorAll('audio').forEach(sound => {
+                sound.pause();
+                sound.currentTime = 0;
+            });
+        }
+        
+        function switchScreen(activeScreen) {
+            allScreens.forEach(screen => screen.classList.remove('active'));
+            activeScreen.classList.add('active');
+            
+            // Asegurar que la pantalla activa esté en la parte superior
+            if (activeScreen.scrollIntoView) {
+                activeScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function init() { 
+            const startOverlay = document.getElementById('start-overlay'); 
+            const introVideo = document.getElementById('intro-video'); 
+            
+            startOverlay.addEventListener('click', () => { 
+                startOverlay.style.display = 'none'; 
+                introVideo.muted = false; 
+                introVideo.play(); 
+            }); 
+            
+            introVideo.addEventListener('ended', () => switchScreen(welcomeScreen)); 
+            introVideo.addEventListener('error', () => switchScreen(welcomeScreen)); 
+            
+            registerForm.addEventListener('submit', handleRegisterSubmit); 
+            restartBtn.addEventListener('click', resetGame); 
+            
+            // Prevenir zoom en dispositivos móviles
+            document.addEventListener('gesturestart', function(e) {
+                e.preventDefault();
+            });
+            
+            // Prevenir scroll en iOS
+            document.addEventListener('touchmove', function(e) {
+                if (e.target === document.documentElement || e.target === document.body) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+        
+        function resetGame() { 
+            currentLevel = 0; 
+            lives = 3; 
+            totalScore = 0; 
+            gameLevels = []; 
+            lastQuestionObject = null; 
+            document.getElementById('player-name').value = ''; 
+            document.getElementById('player-service').value = ''; 
+            const startBtn = document.getElementById('start-btn'); 
+            startBtn.disabled = false; 
+            startBtn.textContent = '¡Comenzar a Jugar!'; 
+            switchScreen(welcomeScreen); 
+        }
+        
+        function handleRegisterSubmit(e) { 
+            e.preventDefault(); 
+            currentPlayerName = document.getElementById('player-name').value; 
+            currentPlayerService = document.getElementById('player-service').value; 
+            
+            if (!currentPlayerName || !currentPlayerService) {
+                alert("Por favor, completa tu nombre y servicio.");
+                return;
+            } 
+            
+            const startBtn = document.getElementById('start-btn'); 
+            startBtn.disabled = true; 
+            startBtn.textContent = 'Cargando...'; 
+            startGame(); 
+        }
+        
         function startGame() {
             stopAllSounds();
             playSound(backgroundMusic);
-            const shuffledQuestions=[...FULL_QUESTION_BANK].sort(()=>0.5-Math.random());
-            gameLevels=[];
+            const shuffledQuestions = [...FULL_QUESTION_BANK].sort(() => 0.5 - Math.random());
+            gameLevels = [];
             
-            // --> CAMBIO: 8 niveles con 10 preguntas cada uno (total 80)
+            // 8 niveles con 10 preguntas cada uno (total 80)
             const levelDistribution = [10, 10, 10, 10, 10, 10, 10, 10]; 
-            for (let i=0; i<8; i++) { 
-                gameLevels.push({level:i+1, questions:shuffledQuestions.splice(0,levelDistribution[i])});
+            
+            for (let i = 0; i < 8; i++) { 
+                gameLevels.push({
+                    level: i + 1, 
+                    questions: shuffledQuestions.splice(0, levelDistribution[i])
+                });
             }
 
-            currentLevel=0;
-            lives=3;
-            totalScore=0;
-            selectedAnswer=false;
-            lastQuestionObject=null;
-            prizeList.innerHTML='';
-            gameLevels.forEach((levelData)=>{const li=document.createElement('li');li.id=`level-${levelData.level-1}`;li.innerHTML=`<span>${levelData.level}</span> NIVEL ${levelData.level}`;prizeList.appendChild(li);});
+            currentLevel = 0;
+            lives = 3;
+            totalScore = 0;
+            selectedAnswer = false;
+            lastQuestionObject = null;
+            prizeList.innerHTML = '';
+            
+            gameLevels.forEach((levelData) => {
+                const li = document.createElement('li');
+                li.id = `level-${levelData.level - 1}`;
+                li.innerHTML = `<span>${levelData.level}</span> NIVEL ${levelData.level}`;
+                prizeList.appendChild(li);
+            });
+            
             switchScreen(gameScreenWrapper);
             loadQuestion();
         }
 
-        function loadQuestion() { if (currentLevel>=gameLevels.length){winGame();return;} playSound(questionStartSound); selectedAnswer=false; updateHUD(); const levelData=gameLevels[currentLevel]; let availableQuestions=levelData.questions; if(lastQuestionObject&&availableQuestions.length>1){availableQuestions=availableQuestions.filter(q=>q.question!==lastQuestionObject.question);} const questionIndex=Math.floor(Math.random()*availableQuestions.length); currentQuestionObject=availableQuestions[questionIndex]; questionBox.innerText=currentQuestionObject.question; optionsGrid.innerHTML=""; const prefixes=['A','B','C','D']; currentQuestionObject.options.forEach((option,index)=>{const button=document.createElement('button');button.classList.add('option-box');button.innerHTML=`<span class="option-prefix">${prefixes[index]}:</span> ${option}`;button.addEventListener('click',()=>selectAnswer(index,button));optionsGrid.appendChild(button);}); }
-        function selectAnswer(selectedIndex,button) { if(selectedAnswer)return; selectedAnswer=true; if(backgroundMusic)backgroundMusic.volume=0.3; const buttons=optionsGrid.getElementsByTagName('button'); button.classList.add('selected'); setTimeout(()=>{ if(backgroundMusic)backgroundMusic.volume=1.0; if(selectedIndex===currentQuestionObject.correct){ playSound(document.getElementById('correct-sound')); button.classList.remove('selected'); button.classList.add('correct'); totalScore++; currentLevel++; lastQuestionObject=null; setTimeout(loadQuestion,1800); } else { playSound(document.getElementById('incorrect-sound')); lives--; lastQuestionObject=currentQuestionObject; button.classList.remove('selected'); button.classList.add('incorrect'); buttons[currentQuestionObject.correct].classList.add('correct'); setTimeout(()=>{if(lives<=0){endGame();}else{loadQuestion();}},2500); } },2000); }
-        function updateHUD() { livesDisplay.innerHTML='Intentos: '+'❤️'.repeat(lives); levelTitle.innerText=`NIVEL ${currentLevel+1}`; const prizeItems=prizeList.getElementsByTagName('li'); for(let i=0;i<prizeItems.length;i++){prizeItems[i].classList.remove('current');} if(currentLevel<gameLevels.length){document.getElementById(`level-${currentLevel}`).classList.add('current');} }
-        function winGame() { handleGameEnd(true); }
-        function endGame() { handleGameEnd(false); }
+        function loadQuestion() { 
+            if (currentLevel >= gameLevels.length) {
+                winGame();
+                return;
+            } 
+            
+            playSound(questionStartSound); 
+            selectedAnswer = false; 
+            updateHUD(); 
+            
+            const levelData = gameLevels[currentLevel]; 
+            let availableQuestions = levelData.questions; 
+            
+            if (lastQuestionObject && availableQuestions.length > 1) {
+                availableQuestions = availableQuestions.filter(q => q.question !== lastQuestionObject.question);
+            } 
+            
+            const questionIndex = Math.floor(Math.random() * availableQuestions.length); 
+            currentQuestionObject = availableQuestions[questionIndex]; 
+            questionBox.innerText = currentQuestionObject.question; 
+            optionsGrid.innerHTML = ""; 
+            
+            const prefixes = ['A', 'B', 'C', 'D']; 
+            currentQuestionObject.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option-box');
+                button.innerHTML = `<span class="option-prefix">${prefixes[index]}:</span> ${option}`;
+                button.addEventListener('click', () => selectAnswer(index, button));
+                optionsGrid.appendChild(button);
+            }); 
+        }
+        
+        function selectAnswer(selectedIndex, button) { 
+            if (selectedAnswer) return; 
+            
+            selectedAnswer = true; 
+            if (backgroundMusic) backgroundMusic.volume = 0.3; 
+            
+            const buttons = optionsGrid.getElementsByTagName('button'); 
+            button.classList.add('selected'); 
+            
+            setTimeout(() => { 
+                if (backgroundMusic) backgroundMusic.volume = 1.0; 
+                
+                if (selectedIndex === currentQuestionObject.correct) { 
+                    playSound(document.getElementById('correct-sound')); 
+                    button.classList.remove('selected'); 
+                    button.classList.add('correct'); 
+                    totalScore++; 
+                    currentLevel++; 
+                    lastQuestionObject = null; 
+                    
+                    setTimeout(loadQuestion, 1800); 
+                } else { 
+                    playSound(document.getElementById('incorrect-sound')); 
+                    lives--; 
+                    lastQuestionObject = currentQuestionObject; 
+                    button.classList.remove('selected'); 
+                    button.classList.add('incorrect'); 
+                    buttons[currentQuestionObject.correct].classList.add('correct'); 
+                    
+                    setTimeout(() => {
+                        if (lives <= 0) {
+                            endGame();
+                        } else {
+                            loadQuestion();
+                        }
+                    }, 2500); 
+                } 
+            }, 2000); 
+        }
+        
+        function updateHUD() { 
+            livesDisplay.innerHTML = 'Intentos: ' + '❤️'.repeat(lives); 
+            levelTitle.innerText = `NIVEL ${currentLevel + 1}`; 
+            
+            const prizeItems = prizeList.getElementsByTagName('li'); 
+            for (let i = 0; i < prizeItems.length; i++) {
+                prizeItems[i].classList.remove('current');
+            } 
+            
+            if (currentLevel < gameLevels.length) {
+                document.getElementById(`level-${currentLevel}`).classList.add('current');
+            } 
+        }
+        
+        function winGame() { 
+            handleGameEnd(true); 
+        }
+        
+        function endGame() { 
+            handleGameEnd(false); 
+        }
 
-        // ======================================================================================
-        // === LÓGICA DE CONEXIÓN SIMPLIFICADA Y ROBUSTA (sin cambios) ==========================
-        // ======================================================================================
         async function handleGameEnd(isWinner) {
             stopAllSounds();
             endMessage.textContent = isWinner ? "¡FELICIDADES, HAS GANADO!" : "¡JUEGO TERMINADO!";
@@ -207,18 +905,26 @@
             switchScreen(endScreen);
 
             if (isWinner && typeof confetti === 'function') {
-                const duration = 2 * 1000; const end = Date.now() + duration;
+                const duration = 2 * 1000; 
+                const end = Date.now() + duration;
+                
                 (function frame() {
                     confetti({particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }});
                     confetti({particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }});
-                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                    if (Date.now() < end) { 
+                        requestAnimationFrame(frame); 
+                    }
                 }());
             }
 
-            const newScoreEntry = { name: currentPlayerName, service: currentPlayerService, score: totalScore, id: Date.now() };
+            const newScoreEntry = { 
+                name: currentPlayerName, 
+                service: currentPlayerService, 
+                score: totalScore, 
+                id: Date.now() 
+            };
 
             try {
-                // Hacemos UNA SOLA LLAMADA: enviamos el puntaje y recibimos el ranking actualizado.
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(newScoreEntry),
@@ -228,11 +934,9 @@
                     throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
                 }
 
-                // La respuesta ya contiene el ranking completo.
                 const fullLog = await response.json();
                 
-                // Si el servidor devolvió un error en el JSON, lo mostramos.
-                if(fullLog.status === 'error'){
+                if (fullLog.status === 'error') {
                     throw new Error(`Error en el script de Google: ${fullLog.message}`);
                 }
                 
@@ -244,7 +948,6 @@
             }
         }
         
-        // La función de mostrar el ranking no cambia.
         function displayLeaderboard(fullLog, currentPlayerId) {
             leaderboardList.innerHTML = "";
             const sortedFullLog = [...fullLog].sort((a, b) => b.score - a.score);
@@ -269,14 +972,21 @@
                 const li = document.createElement('li');
                 const scoreText = `${score.score} Puntos`;
                 li.innerHTML = `<span>#${index + 1} ${score.name} (${score.service || 'N/A'})</span><span>${scoreText}</span>`;
+                
                 if (score.id === currentPlayerId) {
                     li.classList.add('current-player');
                 }
+                
                 leaderboardList.appendChild(li);
             });
         }
 
-        init();
+        // Iniciar el juego cuando el DOM esté listo
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(init, 1);
+        } else {
+            document.addEventListener('DOMContentLoaded', init);
+        }
     </script>
 </body>
 </html>
