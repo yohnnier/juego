@@ -1,122 +1,46 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quién Quiere Ser Enfermero</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <style>
-        /* CSS (sin cambios) */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
-        :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}
-        html, body { height: 100%; margin: 0; }
-        body{font-family:'Roboto',sans-serif;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;overflow:hidden;}
-        .game-container{width:100%;height:100%;background:rgba(0,0,0,0.2);text-align:center;position:relative;display:flex;justify-content:center;align-items:center;}
-        .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;padding: 15px; box-sizing: border-box;}
-        .screen.active{opacity:1;visibility:visible;}
-        #intro-screen{z-index:20; background:black; padding: 0;}
-        #intro-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; z-index: 21;}
-        #start-overlay{position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:22; display:flex; justify-content:center; align-items:center; cursor:pointer;}
-        .btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:clamp(1rem, 4vw, 1.2rem);font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}
-        .btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}
-        .btn:disabled{background:#999;cursor:not-allowed;}
-        #welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:clamp(2rem, 8vw, 3rem);color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1; margin: 10px 0;}
-        #welcome-screen h1 span{display:block;}
-        #welcome-screen form{width:90%;max-width:500px;}
-        .welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}
-        #game-screen-wrapper{background:none;}
-        #game-screen{width:100%;height:100%;display:grid;box-sizing:border-box; grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; grid-template-areas: "prize" "logo" "qa"; gap: 10px; }
-        #logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}
-        #logo-container img{width:auto;max-width:60%;max-height:10vh;object-fit:contain;}
-        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center; min-height: 0;}
-        #prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:5px;}
-        #prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;height:100%;}
-        #prize-list li{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:5px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px; font-size: 0.7rem; white-space: nowrap;}
-        #prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}
-        #prize-list li span:first-child{color:var(--gold);margin-right:5px;}
-        #level-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem, 5vw, 1.8rem);color:var(--gold);margin: 10px 0;text-shadow:0 0 8px var(--gold);}
-        #question-box{width:95%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:clamp(1rem, 4vw, 1.4rem);padding:15px;margin-bottom:15px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}
-        #options-grid{width:95%;display:grid;grid-template-columns:1fr;gap:10px;}
-        .option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:clamp(0.9rem, 3.5vw, 1.2rem);border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}
-        #lives-display{position:absolute;top:15px;left:15px;font-size:1.2rem;font-family:'Orbitron';}
-        #lives-display span{font-size:1.5rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}
-        @media (min-width: 768px) { #game-screen { grid-template-columns: 1fr 250px; grid-template-rows: 120px 1fr; grid-template-areas: "logo prize" "qa   prize"; gap: 20px; padding: 20px; } #qa-container { justify-content: center; } #logo-container img { max-height: 100px; max-width: 80%; } #prize-list { flex-direction:column-reverse; gap:0;} #prize-list li { padding: 0 15px; font-size: 1rem; justify-content: flex-start;} #prize-list li span:first-child { margin-right: 15px; } #options-grid { grid-template-columns: 1fr 1fr; gap:15px; } }
-        .option-box:hover{background:var(--light-blue);}.option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}.option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}.option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}.option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}@keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}@keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}@keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}
-        #leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}#leaderboard-list{list-style:none;padding:0;}#leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500; font-size: clamp(0.8rem, 3vw, 1rem);}#leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}#final-rank{font-size:clamp(1rem, 4vw, 1.3rem);color:var(--gold);margin-top:5px;font-weight:700;}
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <!-- Intro, welcome, game and end screens unchanged -->
-    </div>
-    <!-- Audio elements unchanged -->
+function startGame() {
+    stopAllSounds();
+    playSound(backgroundMusic);
 
-    <script>
-        // URL DEFINITIVA INTEGRADA
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCKsjvfq6yPEMfLoFgQmTmOUVaYaLFVj2RJTYLVOnU0El9fIoK-hNs4PDTLXJlOFCc/exec";
+    // 1. Baraja todo el banco de preguntas para obtener un orden aleatorio.
+    const shuffledQuestions = [...FULL_QUESTION_BANK].sort(() => 0.5 - Math.random());
+    
+    // 2. Reinicia y construye la nueva estructura de niveles del juego.
+    gameLevels = [];
+    const numberOfLevels = 8; // Se definen 8 niveles.
 
-        // BANCO DE PREGUNTAS (sin cambios)
-        const FULL_QUESTION_BANK = [ /* ...preguntas intactas... */ ];
-
-        // Variables y referencias a DOM (sin cambios)
-        // ...
-
-        function startGame() {
-            stopAllSounds();
-            playSound(backgroundMusic);
-            const shuffledQuestions = [...FULL_QUESTION_BANK].sort(() => 0.5 - Math.random());
-            // Asignamos 8 niveles, 1 pregunta aleatoria por nivel
-            gameLevels = shuffledQuestions.slice(0, 8).map((q, i) => ({
+    // 3. Crea 8 niveles, cada uno con una única pregunta extraída de la lista barajada.
+    for (let i = 0; i < numberOfLevels; i++) {
+        // Asegurarse de que todavía hay preguntas disponibles.
+        if (shuffledQuestions.length > 0) {
+            gameLevels.push({
                 level: i + 1,
-                questions: [q]
-            }));
-
-            currentLevel = 0;
-            lives = 3;
-            totalScore = 0;
-            lastQuestionObject = null;
-
-            // Renderizamos ladder con 8 niveles
-            prizeList.innerHTML = '';
-            gameLevels.forEach(levelData => {
-                const li = document.createElement('li');
-                li.id = `level-${levelData.level - 1}`;
-                li.innerHTML = `<span>${levelData.level}</span> NIVEL ${levelData.level}`;
-                prizeList.appendChild(li);
-            });
-
-            switchScreen(gameScreenWrapper);
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            if (currentLevel >= gameLevels.length) {
-                winGame();
-                return;
-            }
-            playSound(questionStartSound);
-            selectedAnswer = false;
-
-            updateHUD();
-            const levelData = gameLevels[currentLevel];
-            // Solo un pregunta por nivel
-            currentQuestionObject = levelData.questions[0];
-
-            questionBox.innerText = currentQuestionObject.question;
-            optionsGrid.innerHTML = '';
-            const prefixes = ['A', 'B', 'C', 'D'];
-            currentQuestionObject.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.classList.add('option-box');
-                button.innerHTML = `<span class="option-prefix">${prefixes[index]}:</span> ${option}`;
-                button.addEventListener('click', () => selectAnswer(index, button));
-                optionsGrid.appendChild(button);
+                // splice(0, 1) extrae el primer elemento y lo devuelve en un array,
+                // asegurando que no se repitan preguntas y manteniendo el formato requerido.
+                questions: shuffledQuestions.splice(0, 1) 
             });
         }
+    }
 
-        // Resto de funciones (selectAnswer, updateHUD, winGame, endGame, handleGameEnd, displayLeaderboard) sin cambios
+    // 4. Reinicia las variables de estado del juego.
+    currentLevel = 0;
+    lives = 3;
+    totalScore = 0;
+    selectedAnswer = false;
+    lastQuestionObject = null;
 
-        init();
-    </script>
-</body>
-</html>
+    // 5. Crea dinámicamente la escalera de premios para los 8 niveles.
+    // Esta parte se adapta automáticamente a la nueva cantidad de niveles.
+    prizeList.innerHTML = '';
+    gameLevels.forEach((levelData) => {
+        const li = document.createElement('li');
+        li.id = `level-${levelData.level - 1}`;
+        // Se ajusta el texto para mayor claridad, ya que cada nivel es una pregunta.
+        li.innerHTML = `<span>${levelData.level}</span> PREGUNTA ${levelData.level}`;
+        prizeList.appendChild(li);
+    });
+
+    // 6. Cambia a la pantalla de juego y carga la primera pregunta.
+    switchScreen(gameScreenWrapper);
+    loadQuestion();
+}
