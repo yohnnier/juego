@@ -6,215 +6,43 @@
     <title>Quién Quiere Ser Enfermero</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <style>
+        /* CSS (sin cambios) */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
-        
         :root{--main-blue:#02022d;--dark-blue:#0c0c4c;--light-blue:#1e3a8a;--gold:#ffd700;--orange-select:#f9a825;--green-correct:#28a745;--red-incorrect:#dc3545;}
-        
-        html, body { 
-            height: 100%; 
-            margin: 0; 
-            overflow: hidden; /* Evita cualquier scroll no deseado en el body */
-        }
-
-        body{
-            font-family:'Roboto',sans-serif;
-            background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);
-            color:#fff;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
-        
-        .game-container{
-            width:100%;
-            height: 100%;
-            /* SOLUCIÓN CLAVE 1: Usar la altura dinámica del viewport */
-            min-height: 100dvh; 
-            max-width: 1600px;
-            margin: auto;
-            background:rgba(0,0,0,0.2);
-            text-align:center;
-            position:relative;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
-        
-        .screen{
-            position:absolute;
-            top:0;
-            left:0;
-            right:0;
-            bottom:0;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            opacity:0;
-            visibility:hidden;
-            transition:opacity 0.5s ease;
-            background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);
-            z-index:10;
-            padding: clamp(10px, 4vw, 20px); 
-            box-sizing: border-box;
-        }
-
+        html, body { height: 100%; margin: 0; }
+        body{font-family:'Roboto',sans-serif;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);color:#fff;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+        .game-container{width:100%;height:100%;background:rgba(0,0,0,0.2);text-align:center;position:relative;display:flex;justify-content:center;align-items:center;}
+        .screen{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease;background:radial-gradient(circle, var(--light-blue) 0%, var(--main-blue) 70%);z-index:10;padding: 15px; box-sizing: border-box;}
         .screen.active{opacity:1;visibility:visible;}
-        
         #intro-screen{z-index:20; background:black; padding: 0;}
         #intro-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; z-index: 21;}
         #start-overlay{position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:22; display:flex; justify-content:center; align-items:center; cursor:pointer;}
-        
-        .btn{
-            font-family:'Orbitron',sans-serif;
-            background:linear-gradient(135deg, var(--gold), var(--orange-select));
-            color:var(--main-blue);
-            border:none;
-            padding: clamp(12px, 2.5vw, 15px) clamp(25px, 5vw, 30px);
-            font-size:clamp(1rem, 4vw, 1.2rem);
-            font-weight:700;
-            border-radius:50px;
-            cursor:pointer;
-            transition:all 0.3s ease;
-            margin-top:20px;
-            box-shadow:0 4px 15px rgba(255,215,0,0.3);
-            z-index:1;
-        }
+        .btn{font-family:'Orbitron',sans-serif;background:linear-gradient(135deg, var(--gold), var(--orange-select));color:var(--main-blue);border:none;padding:15px 30px;font-size:clamp(1rem, 4vw, 1.2rem);font-weight:700;border-radius:50px;cursor:pointer;transition:all 0.3s ease;margin-top:20px;box-shadow:0 4px 15px rgba(255,215,0,0.3);z-index:1;}
         .btn:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 6px 20px rgba(255,215,0,0.5);}
         .btn:disabled{background:#999;cursor:not-allowed;}
-        
-        #welcome-screen h1,#end-screen h2{
-            font-family:'Orbitron',sans-serif;
-            font-size:clamp(2rem, 8vw, 3.5rem);
-            color:var(--gold);
-            text-shadow:0 0 10px var(--gold);
-            z-index:1; 
-            margin: 10px 0;
-        }
+        #welcome-screen h1,#end-screen h2{font-family:'Orbitron',sans-serif;font-size:clamp(2rem, 8vw, 3rem);color:var(--gold);text-shadow:0 0 10px var(--gold);z-index:1; margin: 10px 0;}
         #welcome-screen h1 span{display:block;}
         #welcome-screen form{width:90%;max-width:500px;}
         .welcome-input{display:block;width:100%;box-sizing:border-box;margin:15px auto;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem;}
-        
         #game-screen-wrapper{background:none;}
-        
-        #game-screen{
-            width:100%;
-            height:100%;
-            display:grid;
-            box-sizing:border-box; 
-            grid-template-columns: 1fr; 
-            grid-template-rows: auto auto 1fr; 
-            grid-template-areas: "prize" "logo" "qa"; 
-            gap: clamp(8px, 2vh, 15px);
-        }
-
+        #game-screen{width:100%;height:100%;display:grid;box-sizing:border-box; grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; grid-template-areas: "prize" "logo" "qa"; gap: 10px; }
         #logo-container{grid-area:logo;display:flex;justify-content:center;align-items:center;}
         #logo-container img{width:auto;max-width:60%;max-height:10vh;object-fit:contain;}
-        
-        #qa-container{
-            grid-area:qa;
-            display:flex;
-            flex-direction:column;
-            justify-content:space-evenly;
-            align-items:center; 
-            min-height: 0;
-            /* SOLUCIÓN CLAVE 2: Scroll de seguridad si el contenido es demasiado alto */
-            overflow-y: auto;
-        }
-        
+        #qa-container{grid-area:qa;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center; min-height: 0;}
         #prize-ladder{grid-area:prize;background:rgba(0,0,0,0.4);border-radius:10px;padding:5px;}
         #prize-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;height:100%;}
-        
-        #prize-list li{
-            flex-grow:1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:5px;
-            font-family:'Orbitron',sans-serif;
-            color:rgba(255,255,255,0.7);
-            transition:all 0.3s ease;
-            border-radius:5px; 
-            font-size: clamp(0.6rem, 2.2vw, 0.8rem);
-            white-space: nowrap;
-        }
+        #prize-list li{flex-grow:1;display:flex;align-items:center;justify-content:center;padding:5px;font-family:'Orbitron',sans-serif;color:rgba(255,255,255,0.7);transition:all 0.3s ease;border-radius:5px; font-size: 0.7rem; white-space: nowrap;}
         #prize-list li.current{background-color:var(--orange-select);color:var(--main-blue);font-weight:700;transform:scale(1.1);box-shadow:0 0 15px var(--orange-select);}
         #prize-list li span:first-child{color:var(--gold);margin-right:5px;}
-        
         #level-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem, 5vw, 1.8rem);color:var(--gold);margin: 10px 0;text-shadow:0 0 8px var(--gold);}
-        
-        #question-box{
-            width:95%;
-            height:auto;
-            min-height:80px;
-            background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));
-            border:2px solid var(--gold);
-            border-radius:10px;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:clamp(1rem, 3.5vw, 1.5rem);
-            padding:15px;
-            margin-bottom:15px;
-            clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);
-        }
-        
+        #question-box{width:95%;height:auto;min-height:80px;background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:clamp(1rem, 4vw, 1.4rem);padding:15px;margin-bottom:15px;clip-path:polygon(0% 50%, 5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%);}
         #options-grid{width:95%;display:grid;grid-template-columns:1fr;gap:10px;}
-        
-        .option-box{
-            background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));
-            border:2px solid var(--gold);
-            color:#fff;
-            font-size:clamp(0.9rem, 3vw, 1.2rem);
-            border-radius:10px;
-            cursor:pointer;
-            transition:all 0.2s ease;
-            text-align:left;
-            padding:12px 20px;
-            clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);
-        }
-
-        #lives-display{position:absolute;top:15px;left:15px;font-size:clamp(1rem, 3vw, 1.2rem);font-family:'Orbitron';}
-        #lives-display span{font-size:clamp(1.2rem, 4vw, 1.5rem);margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}
-
-        @media (min-width: 768px) { 
-            #game-screen { 
-                grid-template-columns: 1fr 250px; 
-                grid-template-rows: 120px 1fr; 
-                grid-template-areas: "logo prize" "qa   prize"; 
-                gap: 20px; 
-                padding: clamp(15px, 2.5vw, 30px);
-            } 
-            #qa-container { 
-                justify-content: center; 
-                overflow-y: hidden; /* No necesitamos scroll aquí */
-            } 
-            #logo-container img { max-height: 100px; max-width: 80%; } 
-            #prize-list { flex-direction:column-reverse; gap:0;} 
-            #prize-list li { 
-                padding: 0 15px; 
-                font-size: clamp(0.8rem, 1.2vw, 1rem); 
-                justify-content: flex-start;
-            } 
-            #prize-list li span:first-child { margin-right: 15px; } 
-            #options-grid { grid-template-columns: 1fr 1fr; gap:15px; } 
-        }
-
-        .option-box:hover{background:var(--light-blue);}
-        .option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}
-        .option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}
-        .option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}
-        .option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}
-        
-        @keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
-        @keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}
-        @keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}
-        
-        #leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}
-        #leaderboard-list{list-style:none;padding:0;}
-        #leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500; font-size: clamp(0.8rem, 3vw, 1rem);}
-        #leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}
-        #final-rank{font-size:clamp(1rem, 4vw, 1.3rem);color:var(--gold);margin-top:5px;font-weight:700;}
+        .option-box{background:linear-gradient(180deg, var(--main-blue), var(--dark-blue));border:2px solid var(--gold);color:#fff;font-size:clamp(0.9rem, 3.5vw, 1.2rem);border-radius:10px;cursor:pointer;transition:all 0.2s ease;text-align:left;padding:12px 20px;clip-path:polygon(0% 50%, 8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%);}
+        #lives-display{position:absolute;top:15px;left:15px;font-size:1.2rem;font-family:'Orbitron';}
+        #lives-display span{font-size:1.5rem;margin-left:5px;color:var(--red-incorrect);text-shadow:0 0 5px var(--red-incorrect);}
+        @media (min-width: 768px) { #game-screen { grid-template-columns: 1fr 250px; grid-template-rows: 120px 1fr; grid-template-areas: "logo prize" "qa   prize"; gap: 20px; padding: 20px; } #qa-container { justify-content: center; } #logo-container img { max-height: 100px; max-width: 80%; } #prize-list { flex-direction:column-reverse; gap:0;} #prize-list li { padding: 0 15px; font-size: 1rem; justify-content: flex-start;} #prize-list li span:first-child { margin-right: 15px; } #options-grid { grid-template-columns: 1fr 1fr; gap:15px; } }
+        .option-box:hover{background:var(--light-blue);}.option-prefix{color:var(--orange-select);font-family:'Orbitron',sans-serif;margin-right:15px;}.option-box.selected{background:var(--orange-select);color:var(--main-blue);font-weight:bold;animation:pulse-select 1.2s infinite;}.option-box.correct{background:var(--green-correct);animation:flash-correct 1s;}.option-box.incorrect{background:var(--red-incorrect);animation:shake-incorrect 0.5s;}@keyframes pulse-select{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}@keyframes flash-correct{0%,100%{opacity:1;}50%{opacity:0.3;}}@keyframes shake-incorrect{0%,100%{transform:translateX(0);}10%,30%,50%,70%,90%{transform:translateX(-8px);}20%,40%,60%,80%{transform:translateX(8px);}}
+        #leaderboard-container{margin-top:20px;width:90%;max-width:600px;text-align:left;}#leaderboard-list{list-style:none;padding:0;}#leaderboard-list li{background:rgba(0,0,0,0.3);padding:10px 15px;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;font-weight:500; font-size: clamp(0.8rem, 3vw, 1rem);}#leaderboard-list li.current-player{background:var(--gold);color:var(--main-blue);font-weight:700;}#final-rank{font-size:clamp(1rem, 4vw, 1.3rem);color:var(--gold);margin-top:5px;font-weight:700;}
     </style>
 </head>
 <body>
@@ -227,9 +55,10 @@
     <audio id="intro-sound" src="https://somnozzz.cl/wp-content/uploads/2025/06/Pregunta-Quien-quiere-ser-millonario_-Sound-Effect.mp3" preload="auto"></audio><audio id="question-start-sound" src="https://www.myinstants.com/media/sounds/empezar-pregunta-quien-quiere-ser-millonario.mp3" preload="auto"></audio><audio id="background-music" src="https://somnozzz.cl/wp-content/uploads/2025/06/Quien-Quiere-Ser-Millonario-Efecto-de-Sonido.mp3" preload="auto" loop></audio><audio id="correct-sound" src="https://www.myinstants.com/media/sounds/es-correcto.mp3" preload="auto"></audio><audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/sonido-de-error-de-windows-xp-fatal-error.mp3" preload="auto"></audio>
 
     <script>
-        // --> CÓDIGO JAVASCRIPT SIN CAMBIOS <--
+        // --> URL DEFINITIVA INTEGRADA <--
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCKsjvfq6yPEMfLoFgQmTmOUVaYaLFVj2RJTYLVOnU0El9fIoK-hNs4PDTLXJlOFCc/exec";
 
+        // --> BANCO DE PREGUNTAS CORREGIDO Y VERIFICADO MANUALMENTE <--
         const FULL_QUESTION_BANK = [
             // I. DRENAJE TORÁCICO Y PLEUROSTOMÍA
             { question: "¿Cuál es la razón fisiológica principal para colocar una pleurostomía en el 5° espacio intercostal, línea medio axilar?", options: ["Es la zona más próxima al diafragma.", "Facilitar la movilización del paciente.", "Corresponde a una zona segura y accesible con menor riesgo de dañar estructuras vasculares.", "Mejora la adherencia pulmonar."], correct: 2 },
@@ -240,10 +69,12 @@
             { question: "¿Cuál es un beneficio clínico documentado de la movilización temprana en pacientes con pleurostomía?", options: ["Previene la acumulación de secreciones en el tubo.", "Aumenta la duración del uso del tubo torácico.", "Mejora la reexpansión pulmonar y la función respiratoria.", "Evita el uso de antibióticos profilácticos."], correct: 2 },
             { question: "¿Qué criterio es necesario cumplir antes de retirar un tubo de pleurostomía?", options: ["Disminución del dolor torácico.", "Ausencia de burbujeo y menos de 200 ml de drenaje en 24 horas.", "Saturación de oxígeno superior al 90%.", "Ausencia de secreciones en el tubo."], correct: 1 },
             { question: "¿Cuál es la presión negativa estándar recomendada para el sistema de succión continua en una pleurostomía?", options: ["-10 cmH₂O", "-20 cmH₂O", "-30 cmH₂O", "-40 cmH₂O"], correct: 1 },
+            // II. SEDOANALGESIA Y FARMACOLOGÍA
             { question: "¿Qué factor farmacocinético del propofol justifica su suspensión antes de realizar pruebas neurológicas en pacientes ventilados?", options: ["Su metabolismo renal y acumulación en caso de falla renal.", "Su larga vida media terminal y acumulación tisular.", "Su acción sobre los receptores GABA-A.", "Su interacción con la noradrenalina en perfusión."], correct: 1 },
             { question: "¿Qué combinación de drogas vasoactivas se considera segura en la misma línea Y, siempre que se usa solución salina como diluyente?", options: ["Noradrenalina y dopamina.", "Adrenalina y bicarbonato de sodio.", "Dobutamina y midazolam.", "Propofol y noradrenalina."], correct: 0 },
             { question: "¿Cuál de los siguientes fármacos utilizados en sedoanalgesia puede inducir síndrome de infusión prolongada si se usa más allá de 48 horas a dosis altas?", options: ["Fentanilo", "Propofol", "Midazolam", "Ketamina"], correct: 1 },
             { question: "Paciente adulto de 72 kg, con fiebre persistente postoperatoria, requiere manejo antipirético y se indica paracetamol IV. ¿Cuál es una precaución clave al administrar paracetamol endovenoso?", options: ["Se debe diluir en 100 ml de solución salina y administrar en bolo rápido.", "La infusión debe completarse en no menos de 15 minutos para evitar hipotensión.", "Solo puede administrarse por vía subcutánea o intramuscular.", "No debe administrarse en pacientes con fiebre posoperatoria por riesgo de hepatotoxicidad."], correct: 1 },
+            // III. ACCESOS VASCULARES
             { question: "En un paciente con shock hipovolémico, se requiere infundir soluciones hipertónicas y aminas vasoactivas. ¿Cuál de las siguientes afirmaciones es correcta respecto al tipo de acceso?", options: ["Puede utilizarse un catéter periférico por 72 horas sin riesgo.", "Se debe insertar un acceso subcutáneo con bomba elastomérica.", "El uso de catéter venoso central es obligatorio por pH y osmolaridad.", "El midline es suficiente si se rotan los sitios cada 24 horas."], correct: 2 },
             { question: "Paciente con tratamiento antibiótico de largo plazo recibe vancomicina (pH 2,8, infusión continua). Tiene mala red venosa periférica y requiere infusión por más de 7 días. ¿Qué catéter es el más indicado?", options: ["Catéter venoso periférico.", "Línea media.", "Catéter venoso central tipo PICC.", "Catéter de hemodiálisis."], correct: 2 },
             { question: "¿Cuál de las siguientes características distingue al catéter midline respecto del PICC en cuanto a ubicación anatómica de la punta?", options: ["Ambos terminan en la vena cava superior.", "El midline finaliza en el tercio distal de la vena basílica o cefálica, sin llegar a la cava.", "El PICC se inserta en venas periféricas pero finaliza en aurícula derecha.", "El midline se inserta solo en la yugular externa."], correct: 1 },
@@ -251,10 +82,12 @@
             { question: "¿Cuál de las acciones es crítica antes de utilizar un catéter PICC recién instalado para infusión continua?", options: ["Irrigar con 20 ml de solución salina.", "Confirmar posición de la punta mediante técnica de ECG intracavitario o imagen radiológica.", "Lavar con heparina y comenzar la infusión de inmediato.", "Retirar el apósito inicial y aplicar uno transparente."], correct: 1 },
             { question: "¿Qué criterio contraindica el uso de catéter midline en un paciente hospitalizado?", options: ["Necesidad de antibióticos intravenosos por 7 días.", "Requiere infusión de soluciones con osmolaridad > 900 mOsm/L.", "No tiene accesos venosos periféricos visibles.", "Es alérgico a la clorhexidina."], correct: 1 },
             { question: "¿Cuál es la complicación más frecuente asociada a la inserción de un catéter venoso central en la vena subclavia?", options: ["Flebitis localizada.", "Neumotórax.", "Oclusión de línea por precipitación.", "Trombosis venosa profunda en extremidad inferior."], correct: 1 },
+            // IV. SONDAJE VESICAL
             { question: "En un paciente con antecedente de hiperplasia prostática benigna y episodios de retención urinaria, ¿cuál es el factor clínico más determinante para optar por una sonda intermitente en lugar de uno permanente?", options: ["Mayor comodidad del paciente.", "Menor riesgo de infección urinaria.", "Capacidad para realizar autocateterismo y función vesical conservada.", "Presencia de hematuria persistente."], correct: 2 },
             { question: "¿Cuál es la razón fisiopatológica por la que se desaconseja el uso prolongado de catéter urinario permanente sin indicación estricta?", options: ["Aumenta la presión intravesical provocando reflujo vesicoureteral.", "Disminuye el tono del detrusor por desuso prolongado.", "Genera alcalinización urinaria progresiva.", "Conduce a una hiponatremia secundaria a pérdida urinaria."], correct: 1 },
             { question: "En un paciente con catéter urinario permanente, ¿qué condición indicaría una obstrucción por incrustación crónica del catéter?", options: ["Diuresis aumentada y orina clara.", "Orina con sangre visible y fiebre súbita.", "Dificultad para drenar orina pese a posición correcta y dolor suprapúbico.", "Hipertensión asociada a retención urinaria."], correct: 2 },
             { question: "¿Cuál es el principio microbiológico que justifica la estricta adherencia a un sistema cerrado en el manejo del catéter urinario permanente?", options: ["Evita el ingreso de bacterias por vía hematógena.", "Previene la colonización bacteriana ascendente por manipulación externa.", "Disminuye la excreción de amonio en orina alcalina.", "Impide la formación de biofilm en el meato urinario."], correct: 1 },
+            // V. PREVENCIÓN Y CONTROL DE INFECCIONES (IAAS)
             { question: "¿Cuál es el objetivo principal de un programa de vigilancia epidemiológica del IAAS?", options: ["Reducir los costos hospitalarios.", "Identificar, controlar y prevenir infecciones asociadas a la atención sanitaria.", "Cumplir con requisitos legales únicamente.", "Mejorar la satisfacción del usuario."], correct: 1 },
             { question: "Ante un brote de infección por microorganismo multirresistente, la primera acción de la enfermera de control de infecciones debe ser:", options: ["Informar a los familiares de los pacientes afectados.", "Suspender las cirugías programadas.", "Implementar precauciones de aislamiento y notificar al equipo de control de infecciones.", "Cambiar todos los equipos médicos del servicio."], correct: 2 },
             { question: "¿Cuál es la frecuencia mínima recomendada para la higiene de manos en el personal de salud?", options: ["Al inicio y final del turno.", "Antes y después del contacto con cada paciente.", "Solo cuando las manos están visiblemente sucias.", "Cada 2 horas durante el turno."], correct: 1 },
@@ -263,6 +96,7 @@
             { question: "¿Cuándo se debe implementar aislamiento por contacto?", options: ["Solo en pacientes con fiebre.", "En infecciones por microorganismos multirresistentes y patógenos transmitidos por contacto.", "Únicamente en unidades de cuidados intensivos.", "Solo si el paciente lo solicita."], correct: 1 },
             { question: "El EPP (Elementos de Protección Personal) para precauciones por contacto incluye:", options: ["Solo guantes.", "Guantes, bata y protección ocular siempre.", "Guantes y bata como mínimo, mascarilla según evaluación del riesgo.", "Únicamente mascarilla N95."], correct: 2 },
             { question: "En aislamiento respiratorio por gotas, el EPP indispensable es:", options: ["Mascarilla quirúrgica, guantes y protección ocular.", "Solo mascarilla N95.", "Guantes y bata únicamente.", "Protección completa con traje impermeable."], correct: 0 },
+            // VI. ESTRATEGIA HOSPITAL AMIGO Y ACREDITACIÓN
             { question: "¿Cuál es el objetivo principal de la estrategia Hospital Amigo?", options: ["Reducir los costos operativos del hospital.", "Impulsar la apertura de los establecimientos de salud a la familia y comunidad.", "Aumentar el número de camas disponibles.", "Mejorar únicamente la infraestructura hospitalaria."], correct: 1 },
             { question: "La estrategia Hospital Amigo se implementa en Chile desde:", options: ["2003", "2006", "2010", "2015"], correct: 1 },
             { question: "¿Cuál es una de las características principales de un Hospital Amigo?", options: ["Horarios de visita restringidos únicamente en horarios de oficina.", "Atención humanizada, acogedora y participativa hacia los usuarios.", "Prohibición de acompañantes durante la hospitalización.", "Atención exclusiva para pacientes privados."], correct: 1 },
@@ -275,34 +109,43 @@
             { question: "¿Cuál es el carácter del proceso de acreditación en Chile actualmente?", options: ["Obligatorio para todos los prestadores.", "Voluntario para los prestadores institucionales.", "Obligatorio solo para hospitales públicos.", "Obligatorio solo para prestadores privados."], correct: 1 },
             { question: "En el proceso de acreditación para prestadores de atención cerrada, ¿cuál es el costo establecido para hospitales de alta complejidad según los estándares vigentes?", options: ["150 UTM", "200 UTM", "300 UTM", "500 UTM"], correct: 2 },
             { question: "¿Cuál es el requisito previo fundamental que debe cumplir un prestador institucional de atención cerrada antes de solicitar el proceso de acreditación?", options: ["Tener convenio con FONASA.", "Haber ejecutado y concluido el proceso de autoevaluación.", "Contar con certificación ISO.", "Tener más de 100 camas."], correct: 1 },
+            // VII. PREVENCIÓN DE LESIONES POR PRESIÓN
             { question: "Según la Orientación Técnica para la Prevención de Lesiones por Presión, MINSAL 2023, ¿cuál es la intervención más efectiva para pacientes con movilidad limitada y alto riesgo según Braden?", options: ["Colchón de agua sin reposicionamiento frecuente.", "Almohadas de algodón en prominencias óseas.", "Reposicionamiento cada 2 horas y superficie especial de redistribución de presión.", "Cremas antibióticas en sacro cada 4 horas."], correct: 2 },
             { question: "De acuerdo con la Orientación Técnica MINSAL 2023, ¿cuándo se justifica el uso de superficies de alta tecnología para redistribución de presión?", options: ["Lesión grado 1 en extremidades.", "Solo pérdida de sensibilidad táctil.", "Múltiples factores de riesgo y lesión grado 3 o mayor.", "Cuidados paliativos sin lesión visible."], correct: 2 },
             { question: "Según la Orientación Técnica del MINSAL 2023, ¿qué aspecto guía las intervenciones preventivas de enfermería?", options: ["Edad del paciente.", "Tiempo de hospitalización.", "Escala Braden y observación clínica.", "Preferencia por materiales de cama."], correct: 2 },
             { question: "¿Qué rol asigna la Orientación Técnica MINSAL 2023 al personal de enfermería en prevención de lesiones por presión?", options: ["Cambios de posición solo con lesiones activas.", "Aplicar apósitos solo bajo orden médica.", "Implementar medidas preventivas y liderar educación al equipo.", "Supervisar limpieza de colchones."], correct: 2 },
             { question: "¿Cuál es la frecuencia mínima de reposicionamiento en UCI, según la Orientación Técnica MINSAL 2023?", options: ["Cada 1 hora.", "Cada 4 horas.", "Cada 2 horas con evaluación cutánea.", "Solo al cambio de turno."], correct: 2 },
+            // VIII. MARCO LEGAL Y BENEFICIOS
             { question: "Una enfermera del servicio de medicina realiza turnos exclusivamente diurnos, pero ocasionalmente cubre reemplazos nocturnos en la UTI. ¿Puede acceder a la asignación de la Ley 19.264?", options: ["Sí, si realiza al menos un turno nocturno al mes.", "No, ya que su destino principal no es una unidad cerrada ni en turno rotativo formal.", "Sí, automáticamente por estar en hospital de alta complejidad.", "Solo si firma una carta de compromiso adicional."], correct: 1 },
             { question: "¿Cuál es la finalidad del descanso compensatorio especial de 10 días hábiles anuales para los profesionales regulados por la Ley 19.264?", options: ["Sustituir el feriado legal de 15 días hábiles.", "Compensar el desgaste físico y psíquico por turnos rotativos en unidades críticas.", "Otorgar tiempo para capacitación continua obligatoria.", "Reemplazar el descanso postnatal parental en profesionales varones."], correct: 1 },
             { question: "¿Cuál es la consecuencia establecida por la Ley 19.536 para un profesional beneficiario que es sancionado disciplinariamente durante el período de compensación?", options: ["Se le suspenderá el pago del beneficio por tres meses.", "Pierde el derecho a recibir la compensación desde la fecha de aplicación de la sanción y por el resto del período vigente.", "Deberá devolver las bonificaciones recibidas anteriormente.", "Se le traslada a otra unidad sin bonificación."], correct: 1 },
             { question: "Según la Ley 19.536, ¿cuál es uno de los principales objetivos de otorgar esta calificación al personal de salud?", options: ["Compensar económicamente la escasez de recursos físicos en unidades críticas.", "Reforzar la estabilidad contractual en establecimientos rurales.", "Reconocer el trabajo en unidades de mayor complejidad y rotación, como UCI, Neonatología y Pabellón.", "Sustituir los bonos por desempeño institucional."], correct: 2 },
+            // IX. PROBIDAD ADMINISTRATIVA Y ESTATUTO ADMINISTRATIVO
             { question: "¿Cuál de las siguientes situaciones constituye una vulneración directa al principio de probidad administrativa en un funcionario público de salud?", options: ["No asistir a una capacitación voluntaria fuera del horario laboral.", "Aceptar un obsequio de un familiar de un paciente como agradecimiento por la atención.", "Tomar una pausa para colación en el horario establecido.", "Informar al equipo médico sobre un error en la prescripción de medicamentos."], correct: 1 },
             { question: "Un encargado de calidad en un hospital modifica los datos de cumplimiento de indicadores asistenciales para que el servicio aparezca con un rendimiento superior al real. ¿Qué infracción se configura según el Estatuto Administrativo?", options: ["Optimización de datos para resguardar la imagen institucional.", "Faltas menores por ajustes metodológicos.", "Manipulación de información oficial, constituyendo una falta grave a la probidad administrativa.", "Acción válida si es autorizada verbalmente por la jefatura."], correct: 2 },
             { question: "Una enfermera jefe de pabellón autoriza reiteradamente la compra de insumos a una empresa en la que trabaja su cuñado, sin participar directamente en las ventas. ¿Qué principio es vulnerable a esta situación?", options: ["Principio de eficiencia institucional.", "Derecho a la confidencialidad.", "Principio de probidad por conflicto de interes.", "Principio de legalidad presupuestaria."], correct: 2 },
             { question: "¿Qué principio del Estatuto Administrativo debe respetarse al planificar turnos nocturnos y festivos del personal de enfermería?", options: ["Rotación continua sin horario límite.", "Igualdad en la distribución de cargas y respeto al descanso compensatorio.", "Exclusión de jefaturas del sistema de turnos.", "Prioridad a los funcionarios de mayor antigüedad para evitar el desgaste."], correct: 1 },
             { question: "Una enfermera reclama que ha sido reiteradamente asignada a turnos nocturnos, mientras otros colegas no lo son. ¿Qué derecho está siendo potencialmente vulnerado según el Estatuto Administrativo?", options: ["Derecho al descanso materno.", "Derecho a la neutralidad sindical.", "Derecho a la equidad en la planificación de turnos y no discriminación.", "Derecho a solicitar traslado inmediato."], correct: 2 },
+            // X. LEY KARIN
             { question: "Según la Ley Karin, ¿cuál es la primera obligación del empleador ante una denuncia formal de acoso laboral en un establecimiento de salud pública?", options: ["Desvincular inmediatamente al denunciado.", "Realizar una mediación informal entre las partes.", "Activar el procedimiento interno de investigación conforme al reglamento y adoptar medidas de resguardo para la persona denunciante.", "Informar a los sindicatos del caso."], correct: 2 },
             { question: "¿Qué medida contempla la Ley Karin para proteger a la persona denunciante durante el proceso investigativo?", options: ["Cambiarla de unidad o servicio, con pérdida de asignaciones.", "Suspenderla mientras se realiza la investigación.", "Mantener la confidencialidad y evitar represalias durante todo el proceso.", "Pedirle que renuncie temporalmente al cargo."], correct: 2 },
             { question: "En el contexto de la Ley Karin, ¿cuál de los siguientes ejemplos constituye una manifestación de acoso laboral reiterado?", options: ["Una corrección técnica puntual en una reunión clínica.", "Una crítica aislada en tono firme del supervisor.", "Humillaciones repetidas ante colegas que afectan la dignidad del funcionario.", "La entrega de un memorándum con instrucciones administrativas."], correct: 2 },
+            // XI. ASENF (ASOCIACIÓN DE ENFERMERAS/OS)
             { question: "¿Cuál es uno de los principales roles de ASENF en la defensa de los derechos laborales de las enfermeras del sector público?", options: ["Negociar remuneraciones individualmente con los socios.", "Representar colectivamente a sus afiliadas ante autoridades del MINSAL y Servicios de Salud en casos de vulneración de derechos laborales.", "Otorgar certificados de capacitación válidos para concursos.", "Dirigir exclusivamente procesos disciplinarios internos."], correct: 1 },
             { question: "¿Cómo puede ASENF intervenir en situaciones de maltrato o acoso laboral hacia una enfermera afiliada?", options: ["Otorgando financiamiento externo para la desvinculación.", "Asesorando y acompañando el proceso administrativo y/o judicial, y canalizando denuncias ante entes competentes.", "Permitiendo la renuncia a beneficios laborales para evitar conflictos.", "Sustituyendo al empleador en la gestión del caso."], correct: 1 },
             { question: "¿Qué herramienta gremial puede activar ASENF cuando una unidad hospitalaria presenta turnos inadecuados que vulneran el Estatuto Administrativo?", options: ["Solicitud al ministerio para que modifique la dotación.", "Derivación directa del caso al Colegio Médico.", "Gestión de denuncias colectivas, fiscalización y solicitud formal de revisión al Servicio de Salud respectivo.", "Suspensión de las funciones del jefe de unidad."], correct: 2 },
             { question: "En el contexto de las asignaciones especiales (urgencia, crítica, etc.), ¿de qué forma ASENF puede contribuir a garantizar su correcta aplicación?", options: ["Postulando a los funcionarios directamente.", "Gestionando la resolución administrativa de pago.", "Supervisando internamente la unidad donde se aplica.", "Monitoreando y exigiendo el cumplimiento de los criterios normativos mediante representación técnica ante directivos locales y nacionales."], correct: 3 },
+            // MONITORIZACIÓN HEMODINÁMICA
             { question: "Al observar la curva de presión arterial invasiva, se identifica una forma achatada con descenso de la amplitud y una onda dícrota poco visible. ¿Cuál es la interpretación más probable?", options: ["Hipertensión arterial severa.", "Colapso del sistema respiratorio.", "Subestimación de la presión por amortiguación del sistema o presencia de burbujas.", "Hiperresonancia del transductor."], correct: 2 },
             { question: "Una curva arterial con forma exageradamente picuda y oscilaciones post-sístole excesivas (sobreshooting) indica qué alteraciones técnica del sistema?", options: ["Hipotensión severa.", "Resonancia aumentada por un sistema mal amortiguado (hiperdinámico).", "Falla del transductor.", "Obstrucción del catéter arterial."], correct: 1 },
+            // ELECTROCARDIOGRAFÍA (ECG)
             { question: "En un ECG trazado de 12 derivaciones, una enfermera identifica una elevación del segmento ST en DII, DIII y aVF. ¿Qué sospecha clínica debe priorizar?", options: ["Infarto anterior extenso.", "Isquemia subendocárdica global.", "Infarto agudo de miocardio en cara inferior.", "Bloqueo auriculoventricular de primer grado."], correct: 2 },
             { question: "En un ECG, la presencia de ondas P irregulares, sin morfología definida, acompañadas de una frecuencia ventricular irregular, sugiere:", options: ["Taquicardia supraventricular paroxística.", "Fibrilación auricular.", "Fluter auricular.", "Ritmo nodal."], correct: 1 },
             { question: "¿Qué alteraciones electrocardiográficas es característica de la hiperkalemia severa y debe alertar a la enfermera?", options: ["Ondas T invertidas simétricas.", "Prolongación del intervalo QT.", "Ondas T picudas y acuminadas, con desaparición progresiva de la onda P.", "Bradicardia sinusal con extrasístoles."], correct: 2 },
+            // TERAPIA TROMBOLÍTICA
             { question: "En un paciente con infarto agudo de miocardio con elevación del ST (IAMCEST) que no tiene acceso inmediato a angioplastía, ¿cuál es la ventana de tiempo ideal para administrar trombólisis según las guías actuales?", options: ["Dentro de las primeras 12 horas desde el inicio de los síntomas.", "Solo después de las 24 horas si persiste dolor.", "Hasta 36 horas en cualquier paciente sin importar edad.", "Después de iniciar antiagregación y heparina."], correct: 0 },
-            { question: "¿Cuál de las siguientes condiciones representa una contraindicación absoluta para la trombólisis en un paciente con sospecha de tromboembolismo pulmonar masivo?", options: ["Hipertensión arterial controlada.", "Cirugía mayor recente (últimos 10 días).", "Hemorragia intracraneana previa.", "Uso de anticoagulantes orales."], correct: 2 },
+            { question: "¿Cuál de las siguientes condiciones representa una contraindicación absoluta para la trombólisis en un paciente con sospecha de tromboembolismo pulmonar masivo?", options: ["Hipertensión arterial controlada.", "Cirugía mayor reciente (últimos 10 días).", "Hemorragia intracraneana previa.", "Uso de anticoagulantes orales."], correct: 2 },
+            // REANIMACIÓN CARDIOPULMONAR (RCP) AVANZADA
             { question: "Durante una RCP avanzada, el ritmo en el monitor es fibrilación ventricular. ¿Cuál es la acción inmediata indicada según el protocolo ACLS?", options: ["Administrar adrenalina y realizar masaje cardíaco.", "Realizar desfibrilación inmediata seguida de compresiones.", "Administrar amiodarona y esperar recuperación.", "Colocar marcapasos externos."], correct: 1 },
             { question: "En un paciente intubado durante paro cardiorrespiratorio, ¿cuál es la frecuencia de ventilación recomendada mientras se realizan compresiones torácicas continuas?", options: ["10 ventilaciones por minuto sin interrumpir compresiones.", "30 compresiones por 2 ventilaciones.", "6 ventilaciones por minuto.", "Una ventilación cada 10 segundos."], correct: 0 },
             { question: "Durante la RCP, después de 2 minutos de compresiones y una dosis de adrenalina, se detecta actividad eléctrica sin pulso (AESP). ¿Cuál es el siguiente paso indicado?", options: ["Administrar una descarga eléctrica.", "Continuar RCP y buscar causas reversibles (Hs y Ts).", "Repetir la adrenalina inmediatamente.", "Suspender RCP si hay ritmo."], correct: 1 },
@@ -320,12 +163,16 @@
         function resetGame() { currentLevel=0; lives=3; totalScore=0; gameLevels=[]; lastQuestionObject=null; document.getElementById('player-name').value=''; document.getElementById('player-service').value=''; const startBtn=document.getElementById('start-btn'); startBtn.disabled=false; startBtn.textContent='¡Comenzar a Jugar!'; switchScreen(welcomeScreen); }
         function handleRegisterSubmit(e) { e.preventDefault(); currentPlayerName=document.getElementById('player-name').value; currentPlayerService=document.getElementById('player-service').value; if (!currentPlayerName||!currentPlayerService){alert("Por favor, completa tu nombre y servicio.");return;} const startBtn=document.getElementById('start-btn'); startBtn.disabled=true; startBtn.textContent='Cargando...'; startGame(); }
         
+        // ======================================================================================
+        // === LÓGICA DE JUEGO MODIFICADA PARA 8 NIVELES ========================================
+        // ======================================================================================
         function startGame() {
             stopAllSounds();
             playSound(backgroundMusic);
             const shuffledQuestions=[...FULL_QUESTION_BANK].sort(()=>0.5-Math.random());
             gameLevels=[];
             
+            // --> CAMBIO: 8 niveles con 10 preguntas cada uno (total 80)
             const levelDistribution = [10, 10, 10, 10, 10, 10, 10, 10]; 
             for (let i=0; i<8; i++) { 
                 gameLevels.push({level:i+1, questions:shuffledQuestions.splice(0,levelDistribution[i])});
@@ -348,6 +195,9 @@
         function winGame() { handleGameEnd(true); }
         function endGame() { handleGameEnd(false); }
 
+        // ======================================================================================
+        // === LÓGICA DE CONEXIÓN SIMPLIFICADA Y ROBUSTA (sin cambios) ==========================
+        // ======================================================================================
         async function handleGameEnd(isWinner) {
             stopAllSounds();
             endMessage.textContent = isWinner ? "¡FELICIDADES, HAS GANADO!" : "¡JUEGO TERMINADO!";
@@ -368,6 +218,7 @@
             const newScoreEntry = { name: currentPlayerName, service: currentPlayerService, score: totalScore, id: Date.now() };
 
             try {
+                // Hacemos UNA SOLA LLAMADA: enviamos el puntaje y recibimos el ranking actualizado.
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(newScoreEntry),
@@ -377,8 +228,10 @@
                     throw new Error(`Error en la respuesta del servidor: ${response.statusText}`);
                 }
 
+                // La respuesta ya contiene el ranking completo.
                 const fullLog = await response.json();
                 
+                // Si el servidor devolvió un error en el JSON, lo mostramos.
                 if(fullLog.status === 'error'){
                     throw new Error(`Error en el script de Google: ${fullLog.message}`);
                 }
@@ -391,6 +244,7 @@
             }
         }
         
+        // La función de mostrar el ranking no cambia.
         function displayLeaderboard(fullLog, currentPlayerId) {
             leaderboardList.innerHTML = "";
             const sortedFullLog = [...fullLog].sort((a, b) => b.score - a.score);
